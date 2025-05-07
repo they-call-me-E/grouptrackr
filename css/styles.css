@@ -1,0 +1,1400 @@
+ /* General styling */
+ :root {
+     --text-main-color: #ffffff;
+     --text-second-color: #FFFFFF99;
+     --menu-background: #07101d;
+     --menu-button-color: #47e9ff;
+     --menu-button-text: #080d2b;
+     --list-item-background: #333;
+     --list-item-shadow: #555;
+     --avatar-border: #ffffff;
+     --menu-shadow-1: rgba(0, 0, 0, 0.3);
+     --menu-shadow-2: rgba(255, 255, 255, 255, 0.1);
+     --dropdown-background: #26253d;
+     --dropdown-text: #ffffff99;
+     --dropdown-text-selected: #ffffff;
+
+ }
+
+ .lightmode {
+     --text-main-color: #212121;
+     --text-second-color: #828282;
+     --menu-background: #F8F8F8;
+     --menu-button-color: #68c7ff;
+     --menu-button-text: #080d2b;
+     --list-item-background: #dadada;
+     --list-item-shadow: #bbb;
+     --avatar-border: #888;
+     --menu-shadow-1: rgba(0, 0, 0, 0.1);
+     --menu-shadow-2: rgba(0, 0, 0, 0.05);
+     --dropdown-background: #fff;
+     --dropdown-text: #00000099;
+
+ }
+
+ body,
+ html {
+     margin: 0;
+     padding: 0;
+     height: 100%;
+     font-family: "Poppins", sans-serif;
+     overflow-x: hidden;
+     /* Prevent horizontal scroll */
+ }
+
+ h1,
+ h2,
+ h3,
+ p {
+     font-family: "Poppins", sans-serif;
+     color: var(--text-main-color);
+
+ }
+
+ h1 {
+     font-weight: 700;
+     /* Bold weight */
+ }
+
+ p {
+     font-weight: 400;
+     /* Regular weight */
+ }
+
+ #map {
+     position: absolute;
+     top: 0;
+     bottom: 0;
+     width: 100%;
+ }
+
+ /* Circle Div for Member Marker */
+ .circle-div {
+     width: 60px;
+     height: 60px;
+     border-radius: 50%;
+     background-color: var(--avatar-border);
+     /* Outer white circle */
+     position: relative;
+     overflow: hidden;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+
+ /* Expanded marker style */
+ .circle-div-expanded {
+     width: 200px;
+     height: 100px;
+     border-radius: 10px;
+     /* You can change this for rectangular shape */
+     background-color: white;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     transition: width 0.3s ease, height 0.3s ease;
+     /* top: -41px; */
+
+ }
+
+ /* Inner colored circle */
+ .circle-inner {
+     width: 55px;
+     /* 90%; */
+     height: 55px;
+     /* 90% */
+     border-radius: 50%;
+     background-color: rgb(0, 122, 255);
+     /* Default color */
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+
+ .circle-inner-expanded {
+     width: 55px;
+     height: 55px;
+     border-radius: 50%;
+     background-color: rgb(0, 122, 255);
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     position: absolute;
+     left: 5px;
+ }
+
+ .circle-inner div {
+     font-size: 18px;
+     font-weight: bold;
+     color: white;
+ }
+
+ .circle-div img {
+     width: 55px;
+     height: 55px;
+     border-radius: 50%;
+     object-fit: cover;
+     /* Ensures the image fits inside the circle */
+ }
+
+ /* Tail Div for the marker */
+ .tail-div {
+     width: 0;
+     height: 0;
+     border-left: 6px solid transparent;
+     border-right: 6px solid transparent;
+     border-top: 5px solid var(--avatar-border);
+     position: absolute;
+     left: 50%;
+     top: 59px;
+     transform: translateX(-50%);
+ }
+
+ /* Loading Spinner Styles */
+ #loadingSpinner {
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     border: 8px solid #f3f3f3;
+     border-radius: 50%;
+     border-top: 8px solid #3498db;
+     width: 60px;
+     height: 60px;
+     animation: spin 1s linear infinite;
+     z-index: 999;
+     display: none;
+     /* Hidden by default */
+ }
+
+ @keyframes spin {
+     0% {
+         transform: rotate(0deg);
+     }
+
+     100% {
+         transform: rotate(360deg);
+     }
+ }
+
+ /* Slide-out menu styles */
+ .menu {
+     position: fixed;
+     top: 7px;
+     left: -250px;
+     width: 250px;
+     height: 500px;
+     /* height: 225px; */
+     /* Set height to accommodate 4 member cards */
+     background-color: var(--menu-background);
+     color: white;
+     transition: left 0.3s ease;
+     z-index: 1000;
+     overflow: hidden;
+     /* Ensure no scroll on the entire menu */
+     border-radius: 16px;
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+     transition: height 0.5s ease-in-out, padding 0.5s ease-in-out;
+ }
+
+ .menu.open {
+     height: 500px;
+ }
+
+ .menu-open .menu {
+     left: 7px;
+ }
+
+ .top-menu {
+     width: 100%;
+     height: auto;
+     background-color: var(--menu-background);
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     /* Vertically center content within the fixed height */
+     align-items: center;
+     /* Horizontally center the content */
+     padding: 0;
+     position: relative;
+     padding-top: 7px;
+     z-index: 16;
+     /* Adjust to create space for the close button */
+ }
+
+ .top-menu h3 {
+
+     width: 100%;
+     /* Takes full width of the menu */
+     text-align: left;
+     /* Aligns the text to the left */
+     padding-left: 14%;
+     /* Aligns the text with the dropdown box */
+     margin-bottom: 5px;
+     /* Adds 5px space below the heading */
+     font-size: 16px;
+     margin-top: -7px;
+ }
+
+ .top-menu select {
+     width: 100%;
+     /* Center the dropdown to match button width */
+     max-width: 220px;
+     /* Ensure dropdown doesn't exceed button width */
+     padding: 5px;
+     border-radius: 10px;
+     border: 1px solid #444;
+     background-color: #262d3d;
+     color: white;
+     font-size: 14px;
+     text-align: center;
+     margin-bottom: 10px;
+     /* Adds space between dropdown and buttons */
+ }
+
+ .top-menu-buttons {
+     display: flex;
+     justify-content: space-between;
+     /* Evenly space the buttons */
+     width: 100%;
+     /* Match the dropdown width */
+     max-width: 220px;
+     /* Ensure the buttons don’t exceed the dropdown width */
+     margin-top: 10px;
+ }
+
+ .top-menu-buttons button {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 48%;
+     padding: 10px;
+     background-color: var(--menu-button-color);
+     color: var(--menu-button-text);
+     border: none;
+     cursor: pointer;
+     border-radius: 16px;
+     text-align: center;
+     font-size: 13px;
+     /* Ensures the text size is balanced with the SVG */
+     font-family: 'Poppins', sans-serif;
+     /* Ensure the font is applied */
+     font-weight: 700;
+ }
+
+ .top-menu-buttons button .svg-icon {
+     display: flex;
+     align-items: center;
+     /* Vertically aligns the SVG */
+     justify-content: center;
+     margin-right: 8px;
+     /* Adds space between the SVG and text */
+     height: 100%;
+     /* Ensures the SVG fills the button's height */
+ }
+
+ .top-menu-buttons button span {
+     display: flex;
+     align-items: center;
+     /* Vertically aligns the text */
+     justify-content: center;
+ }
+
+ .top-menu-buttons button:hover {
+     background-color: #555;
+ }
+
+ /* Updated members div styles */
+ .members-div {
+     width: 100%;
+     background-color: var(--menu-background);
+     color: white;
+
+     overflow: hidden;
+     padding: 0;
+     /* transition: max-height 0.5s ease-out, padding 0.5s ease-out; */
+     position: relative;
+     max-height: 0px;
+     /* Fit for 3 member cards */
+     overflow-y: auto;
+     /* Scrollable if more than 3 cards */
+     /* transition: max-height 0.5s ease; */
+ }
+
+ .members-div.open {
+     /* padding: 10px; */
+     max-height: 275px;
+     overflow-y: auto;
+ }
+
+ .members-div.open-scroll {
+     overflow-y: auto;
+ }
+
+ .members-div::-webkit-scrollbar {
+     display: none;
+ }
+
+ /* Style the Members Settings button */
+ #members-settings-btn,
+ #fences-settings-btn {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 100%;
+     max-width: 220px;
+     padding: 10px;
+     background-color: var(--menu-button-color);
+     color: var(--menu-button-text);
+     border: none;
+     cursor: pointer;
+     border-radius: 16px;
+     text-align: center;
+     font-size: 13px;
+     font-family: 'Poppins', sans-serif;
+     font-weight: 700;
+     margin: 6px auto 0 auto;
+     z-index: 11;
+     position: relative;
+     top: 270px;
+     padding-right: 10px;
+ }
+
+ #fences-settings-btn .svg-icon {
+     padding-right: 10px;
+ }
+
+ /* Ensure button has proper hover styling */
+ #members-settings-btn:hover {
+     background-color: #555;
+ }
+
+ /* #members-settings-btn {
+   position: absolute;
+   bottom: 10px;
+   left: 0;
+   right: 0;
+   margin: 0 auto;
+ } */
+
+ /* Member box adjustments */
+ .member-box {
+     width: calc(100% - 20px);
+     height: 80px;
+     position: relative;
+     margin: 10px auto 10px;
+     padding: 10px;
+     /* display: flex; */
+     align-items: center;
+     border-bottom: 1px solid var(--list-item-shadow);
+     background-color: var(--list-item-background);
+     border-radius: 9px;
+     box-sizing: border-box;
+     /* Ensure padding doesn't increase the width */
+     overflow: hidden;
+     z-index: 150;
+     justify-content: space-between;
+     /* Prevent content from spilling out */
+     cursor: pointer;
+     /* Change cursor to pointer */
+     user-select: none;
+     /* Prevent text selection */
+ }
+
+ /* .member-box svg {
+     height: 20px;
+     width: 20px;
+ } */
+
+ .member-avatar .init-cir {
+     height: 90%;
+     width: 90%;
+     border-radius: 9999px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.5em;
+     color: var(--text-main-color);
+ }
+
+ .member-avatar {
+     width: 60px;
+     height: 60px;
+     border-radius: 50%;
+     margin-right: 10px;
+     background-color: var(--avatar-border);
+     position: relative;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     overflow: hidden;
+     flex-shrink: 0;
+ }
+
+ .member-avatar img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+ }
+
+ .member-avatar div {
+     font-size: 18px;
+     font-weight: bold;
+     color: white;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     width: 100%;
+     height: 100%;
+ }
+
+ .gps-coordinates {
+     font-size: 12px;
+     color: #ccc;
+ }
+
+ /* Toggle button style */
+ #toggle-menu {
+     font-size: 24px;
+     padding: 10px 15px;
+     cursor: pointer;
+     background-color: var(--menu-button-color);
+     color: #080D2B;
+     border: none;
+     position: fixed;
+     top: 20px;
+     left: 20px;
+     z-index: 9;
+     border-radius: 16px;
+ }
+
+ .close-container {
+     display: flex;
+     justify-content: flex-end;
+     width: 100%;
+     padding-right: 13px;
+ }
+
+ .close-menu {
+     width: 30px;
+     height: 30px;
+     background-color: var(--list-item-background);
+     color: var(--text-second-color);
+     font-size: 20px;
+     text-align: center;
+     line-height: 30px;
+     border-radius: 50%;
+     cursor: pointer;
+     border: none;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     /* Center horizontally */
+
+ }
+
+ .close-menu svg {
+     color: var(--text-second-color);
+     stroke: var(--text-second-color);
+     height: 30px;
+     width: 30px;
+ }
+
+ .close-menu svg.icon {
+     stroke: var(--text-second-color);
+     /* Controls stroke color */
+     height: 25px;
+     /* Controls height */
+     width: 25px;
+     /* Controls width */
+ }
+
+ /* Rectangle div for expanded marker */
+ .marker-expanded {
+     width: 220px;
+     height: 120px;
+     background-color: var(--menu-background);
+     border: 2px solid #007cbf;
+     border-radius: 10px;
+     position: relative;
+     display: none;
+     z-index: 1;
+     padding: 10px 10px 10px 70px;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     /* top: -85px; */
+     transition: width 0.4s ease, height 0.4s ease;
+     /* Smooth transition for width and height */
+     z-index: 9999;
+ }
+
+ .marker-expanded img {
+     height: 56px;
+     left: 17px;
+     position: absolute;
+     z-index: 9;
+     border-radius: 50%;
+     top: 17px;
+
+ }
+
+ .marker-expanded.show {
+     display: block;
+     width: 200px;
+     height: 100px;
+     transition: width 0.4s ease, height 0.4s ease;
+     z-index: 9999;
+     /* Smooth transition for width and height */
+ }
+
+ /* Marker circle inside rectangle */
+ .marker-expanded .circle-div {
+     position: absolute;
+     top: 15px;
+     left: 15px;
+     width: 60px;
+     height: 60px;
+ }
+
+ .marker-expanded .close-btn {
+     display: block;
+     background-color: var(--text-second-color);
+ }
+
+ .marker-expanded .content {
+     font-size: 12px;
+     color: var(--text-second-color);
+ }
+
+ /* Close button styles */
+ .marker-expanded .close-btn {
+     position: absolute;
+     top: 5px;
+     right: 5px;
+     background-color: var(--text-second-color);
+     color: #fff;
+     border: none;
+     border-radius: 50%;
+     cursor: pointer;
+     width: 20px;
+     height: 20px;
+     text-align: center;
+     line-height: 18px;
+ }
+
+ .popup-member-name {
+     position: absolute;
+     top: 31px;
+     left: 81px;
+     font-weight: bold;
+     font-size: x-large;
+     color: var(--text-main-color);
+ }
+
+ .popup-charging-icon.charging {
+     stroke: var(--menu-button-color);
+     position: absolute;
+     top: 2px;
+     left: 218px;
+
+ }
+
+ .popup-charging-icon.not-charging {
+     stroke: var(--menu-button-color);
+     position: absolute;
+     top: 2px;
+     left: 218px;
+
+ }
+
+ .popup-battery {
+     position: absolute;
+     top: 8px;
+     left: 243px;
+     font-size: small;
+ }
+
+ .popup-battery-level {
+     position: absolute;
+     top: 4px;
+     left: 185px;
+ }
+
+ .popup-wifi-icon.true {
+     stroke: var(--menu-button-color);
+     position: absolute;
+     top: 5px;
+     left: 245px;
+     height: 18px;
+ }
+
+ .popup-member-speed {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 60px;
+     left: 80px;
+ }
+
+ .popup-member-speed-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 60px;
+     left: 130px;
+
+ }
+
+ .popup-screen-on {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 60px;
+     left: 185px;
+ }
+
+ .popup-screen-on-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 60px;
+     left: 240px;
+ }
+
+ .popup-member-address {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 80px;
+     left: 8px;
+ }
+
+ .popup-member-address-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 80px;
+     left: 68px;
+ }
+
+ .popup-lat {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 120px;
+     left: 10px;
+ }
+
+ .popup-lat-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 120px;
+     left: 40px;
+ }
+
+ .popup-long {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 120px;
+     left: 120px;
+ }
+
+ .popup-long-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: absolute;
+     top: 120px;
+     left: 160px;
+ }
+
+ .card-charging-icon,
+ .card-wifi-icon {
+     flex-shrink: 0;
+     /* Ensure the SVG does not shrink */
+     margin-left: 10px;
+     /* Add spacing between text and SVG */
+ }
+
+ .card-charging-icon {
+     position: relative;
+     top: -69px;
+     left: 180px;
+
+ }
+
+ .card-charging-icon.charging {
+     stroke: var(--menu-button-color);
+
+ }
+
+ .card-charging-icon.not-charging {
+     stroke: var(--menu-button-color);
+ }
+
+ .card-wifi-icon {
+     position: relative;
+     top: -73px;
+     left: 116px;
+     height: 18px;
+ }
+
+ .card-wifi-icon.true {
+     stroke: var(--menu-button-color);
+
+ }
+
+ .card-wifi-icon.false {
+     stroke: var(--text-second-color);
+ }
+
+ .card-member-name {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bolder;
+     font-size: medium;
+     position: relative;
+     top: -55px;
+     left: 65px;
+     white-space: nowrap;
+ }
+
+ .card-member-speed {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: relative;
+     top: -56px;
+     left: 65px;
+ }
+
+ .card-member-speed-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: relative;
+     top: -55px;
+     left: 72px;
+     display: inline-block;
+ }
+
+ .card-member-address {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bold;
+     position: relative;
+     top: -15px;
+     left: -54px;
+ }
+
+ .card-member-address-value {
+     color: var(--text-second-color);
+     font-size: small;
+     font-weight: bold;
+     position: relative;
+     top: -16px;
+     left: 0px;
+     display: inline-block;
+ }
+
+ .members-container {
+     /* padding: 10px; */
+     color: wheat;
+     margin: 0;
+     /* max-height: 0px; */
+     height: 0px;
+     /* max-height: 335px; */
+     overflow: hidden;
+     transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+     width: 100%;
+     z-index: 5;
+     position: relative;
+     padding-top: 10px;
+     padding-bottom: 0;
+     opacity: 0;
+ }
+
+ .members-container.open {
+     /* max-height: 335px; */
+     height: 335px;
+     padding-top: 10px;
+     padding-bottom: 10px;
+     z-index: 11;
+     opacity: 1;
+     /* Adjusted height to show 3 member cards and settings button */
+ }
+
+ .fences-container {
+     /* padding: 10px; */
+     color: wheat;
+     margin: 0;
+     /* height: 10px; */
+     max-height: 0;
+     overflow: hidden;
+     opacity: 0;
+     transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out,
+         opacity 0.5s ease-in-out;
+     width: 100%;
+     z-index: 5;
+     position: relative;
+     padding-top: 10px;
+     padding-bottom: 0;
+ }
+
+ .fences-container.open {
+     max-height: 335px;
+     opacity: 1;
+     height: 335px;
+     padding-top: 10px;
+     padding-bottom: 10px;
+     z-index: 11;
+     /* Adjusted height to show 3 member cards and settings button */
+ }
+
+ .profile-button {
+     position: absolute;
+     /* Allow positioning relative to the container */
+     width: 36px;
+     height: 36px;
+     /* background-color: var(--text-main-color); */
+     background-color: transparent;
+     color: var(--menu-button-text);
+     border: none;
+     cursor: pointer;
+     border-radius: 16px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 0;
+     bottom: 17px;
+     /* Positioned 10px from the bottom */
+     left: 17px;
+     /* Positioned 10px from the left */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+     z-index: 1;
+ }
+
+ .profile-button img {
+     width: 95%;
+     /* Ensure the image takes the full size of the button */
+     height: 95%;
+     object-fit: cover;
+     border-radius: 50%;
+     /* Keeps the image circular */
+ }
+
+ /* Blue overlay div styling */
+ .profile-menu {
+     position: absolute;
+     top: 0;
+     left: -250px;
+     width: 100%;
+     height: 100%;
+     background-color: var(--menu-background);
+     z-index: 1001;
+     /* opacity: 0.95; */
+     transition: left 0.3s ease;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     border-radius: 16px;
+ }
+
+ .profile-menu-open {
+     /* transform:translateX(0); */
+     left: 0px;
+ }
+
+ /* Profile Section */
+ .profile-section {
+     text-align: center;
+
+ }
+
+ .profile-img {
+     width: 80px;
+     height: 80px;
+     border-radius: 50%;
+     object-fit: cover;
+     padding-top: 15px;
+     stroke: white;
+ }
+
+ .profile-name {
+     font-size: 20px;
+     font-weight: 600;
+     margin: 5px 0 5px;
+     color: var(--text-main-color);
+ }
+
+ .profile-name-input {
+     font-size: 20px;
+     font-weight: 600;
+     color: white;
+     /* Set the text color to white */
+     border: none;
+     outline: none;
+     background-color: var(--menu-background);
+     /* Match the background to the menu or use a box color */
+     border-radius: 10px;
+     /* Optional: make the input look like a box */
+     text-align: center;
+     /* Keep the text centered */
+     padding: 10px;
+     width: 100%;
+     box-sizing: border-box;
+     /* Ensure padding doesn't affect the width */
+ }
+
+
+
+ .profile-location {
+     font-size: 14px;
+     color: var(--text-main-color);
+     margin: 0;
+ }
+
+ .profile-role {
+     font-size: 16px;
+     font-weight: 400;
+     color: white;
+     margin: 5px 0;
+ }
+
+ .upgrade-btn {
+     background-color: #ff4081;
+     color: white;
+     padding: 10px 20px;
+     border: none;
+     border-radius: 20px;
+     margin-top: 10px;
+     cursor: pointer;
+     font-weight: 600;
+     font-size: 14px;
+ }
+
+ .upgrade-btn:hover {
+     background-color: #e0356b;
+ }
+
+ /* Settings Section */
+ .settings-section {
+     width: 90%;
+ }
+
+ .settings-section h4 {
+     color: var(--text-main-color);
+     margin-bottom: 10px;
+     font-size: 18px;
+     font-weight: 600;
+ }
+
+ .settings-list {
+     list-style: none;
+     padding: 0;
+ }
+
+ .settings-list li {
+     background-color: var(--list-item-background);
+     color: var(--text-main-color);
+     border-radius: 16px;
+     padding: 15px;
+     margin-bottom: 10px;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     font-size: 16px;
+ }
+
+ .settings-icon {
+     margin-right: 10px;
+ }
+
+ .settings-icon svg {
+     width: 24px;
+     height: 24px;
+     color: white;
+     /* Set icon color to white */
+ }
+
+
+ /* Toggle switch container */
+ .switch {
+     position: relative;
+     display: inline-block;
+     width: 34px;
+     height: 20px;
+ }
+
+ /* Hide the actual checkbox */
+ .switch input {
+     opacity: 0;
+     width: 0;
+     height: 0;
+ }
+
+ /* The slider */
+ .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #ccc;
+     transition: .4s;
+     border-radius: 34px;
+ }
+
+ .slider:before {
+     position: absolute;
+     content: "";
+     height: 14px;
+     width: 14px;
+     left: 3px;
+     bottom: 3px;
+     background-color: white;
+     transition: .4s;
+     border-radius: 50%;
+ }
+
+ /* When the checkbox is checked, change the slider's background */
+ input:checked+.slider {
+     background-color: var(--menu-button-color);
+ }
+
+ /* Move the slider's circle to the right when checked */
+ input:checked+.slider:before {
+     transform: translateX(14px);
+ }
+
+ /* Rounded slider */
+ .slider.round {
+     border-radius: 34px;
+ }
+
+ .slider.round:before {
+     border-radius: 50%;
+ }
+
+ /* Back Arrow Styling */
+ .back-arrow {
+     position: absolute;
+     top: 20px;
+     left: 20px;
+     /* Positioned at the top-left corner */
+     width: 25px;
+     height: 25px;
+     background-color: var(--list-item-background);
+     border-radius: 50%;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     cursor: pointer;
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+     z-index: 10;
+ }
+
+ .back-arrow svg {
+     width: 24px;
+     height: 24px;
+     color: var(--text-second-color);
+     /* Change arrow color as needed */
+ }
+
+ .back-arrow:hover {
+     background-color: #f0f0f0;
+     /* Hover effect */
+ }
+
+ .marker .badge {
+     position: absolute;
+     top: -18px;
+     right: -50px;
+     background-color: #fff;
+     /* Background for contrast */
+     border-radius: 9999px;
+     /* Make it round */
+     border-width: 2px;
+     /* Set border width */
+     border-color: #000;
+     /* Set border color */
+     border-style: solid;
+     /* Ensure the border is visible */
+     width: auto;
+     /* Allow flexible width */
+     height: 30px;
+     padding: 0 5px;
+     /* Add padding to fit both image and text */
+     overflow: hidden;
+     /* Ensure content fits inside */
+     display: flex;
+     /* Display items side by side */
+     align-items: center;
+     /* Align items in the center vertically */
+     white-space: nowrap;
+     /* Prevent line breaks inside the badge */
+ }
+
+ .marker .badge img {
+     width: 50px;
+     /* Smaller width to fit alongside text */
+     height: 50px;
+     /* Smaller height to fit alongside text */
+     object-fit: contain;
+ }
+
+ .badge.shoe img {
+     height: 30px;
+ }
+
+ #car {
+     animation: bounce 1s infinite ease-in-out;
+     display: block;
+     margin: 0 auto;
+ }
+
+ @keyframes bounce {
+
+     0%,
+     100% {
+         transform: translateY(0);
+         /* Start and end at the original position */
+     }
+
+     50% {
+         transform: translateY(-1px);
+         /* Move up 10px */
+     }
+ }
+
+ .marker .badge-speed {
+     font-size: 12px;
+     /* Adjust font size */
+     margin-left: -1px;
+     /* Space between the image and speed */
+     color: #000;
+     /* Text color */
+     font-weight: bold;
+     white-space: nowrap;
+     /* Prevent the speed from wrapping to a new line */
+ }
+
+ /* Basic modal styling */
+ .modal {
+     display: none;
+     position: fixed;
+     z-index: 1000;
+     left: 0;
+     top: 0;
+     width: 100%;
+     height: 100%;
+     overflow: hidden;
+     background-color: rgb(0, 0, 0);
+     background-color: rgba(0, 0, 0, 0.4);
+     border-width: 1px;
+     border-style: solid;
+     border-color: rebeccapurple;
+ }
+
+ .modal-content {
+     /* background-color: #fefefe; */
+
+     /*margin: 10% auto; */
+     padding: 0px;
+     border: 1px solid #888;
+     width: 80%;
+     height: 80%;
+     border-style: none;
+     min-width: 80%;
+     min-height: 300px;
+     /* overflow: hidden; */
+     margin-left: 10%;
+     ;
+ }
+
+ .fenceIframe {
+     height: 100%;
+     width: 100%;
+ }
+
+ .close {
+     color: #aaa;
+     float: right;
+     font-size: 28px;
+     font-weight: bold;
+     position: relative;
+     top: 37px;
+     left: -5px;
+ }
+
+ .close:hover,
+ .close:focus {
+     color: black;
+     text-decoration: none;
+     cursor: pointer;
+ }
+
+ /* Styling for the fence row */
+ .fence-row {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     padding: 10px;
+     border-bottom: 1px solid #ddd;
+     cursor: pointer;
+ }
+
+ .fence-row .fence-name {
+     margin-left: 10px;
+     flex-grow: 1;
+     font-size: 16px;
+     cursor: pointer;
+ }
+
+ .fence-row svg {
+     cursor: pointer;
+ }
+
+ .fence-item {
+
+     width: calc(100% - 20px);
+     height: 55px;
+     position: relative;
+     margin: 5px auto 5px 6px;
+     padding: 10px;
+     display: flex;
+     align-items: center;
+     border-bottom: 1px solid var(--list-item-shadow);
+     background-color: var(--list-item-background);
+     border-radius: 9px;
+     box-sizing: border-box;
+     overflow: hidden;
+     z-index: 15;
+     left: 3px;
+     opacity: 1;
+ }
+
+
+ .fence-name {
+     color: var(--text-main-color);
+     font-size: small;
+     font-weight: bolder;
+     font-size: medium;
+     position: relative;
+     white-space: nowrap;
+     flex-grow: 1;
+     /* margin-left: 10px; */
+     position: relative;
+     left: -20px;
+ }
+
+ .fence-icon {
+     position: relative;
+     left: -15px;
+     width: 60px;
+     height: 60px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     margin-right: 10px;
+ }
+
+ .edit-icon {
+     cursor: pointer;
+     position: relative;
+     right: 0;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+ }
+
+ .fences-containe1r {
+     margin: 0;
+     max-height: 0px;
+     overflow: hidden;
+     transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+     width: calc(100%-10px);
+     z-index: 5;
+     position: absolute;
+     padding-top: 0;
+     padding-bottom: 0;
+ }
+
+ .fences-container {
+     max-height: 0;
+     display: block;
+     /* Initially hidden */
+     /* background-color: wheat; */
+     position: absolute;
+     top: 160px;
+     width: 100%;
+     height: auto;
+     overflow: hidden;
+     transition: max-height 0.5s ease-in-out;
+     /* Smooth transition */
+ }
+
+ .fences-container.open {
+     max-height: 335px;
+ }
+
+ .fences-div {
+     width: 100%;
+     background-color: var(--menu-background);
+     color: white;
+     overflow: hidden;
+     padding: 0;
+     transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+     position: relative;
+     max-height: 0px;
+     overflow-y: auto;
+ }
+
+ .fences-div.open {
+     max-height: 270px;
+     overflow-y: auto;
+ }
+
+ .fences-div.open-scroll {
+     overflow-y: auto;
+ }
+
+ #fencesDiv::-webkit-scrollbar {
+     width: 0px;
+     /* Hide scrollbar */
+     display: none;
+     /* Hide scrollbar track */
+ }
+
+ #fencesDiv {
+     scrollbar-width: none;
+     /* Firefox-specific to hide scrollbar */
+     -ms-overflow-style: none;
+     /* IE and Edge-specific to hide scrollbar */
+ }
+
+ #membersDiv,
+ #fencesDiv {
+     opacity: 0;
+     transition: opacity 0.3s ease;
+     position: absolute;
+     z-index: 1;
+     /* Ensure they don't overlap */
+ }
+
+ #membersDiv.open,
+ #fencesDiv.open {
+     opacity: 1;
+     z-index: 99999;
+ }

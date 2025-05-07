@@ -1,0 +1,109 @@
+/* Create Group Modal Styles */
+
+/* Modal container */
+.create-modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    z-index: 2000;
+    /* Ensure it's above other elements */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Black with opacity */
+}
+
+/* Modal content box */
+.create-modal-content {
+    background-color: var(--menu-background);
+    margin: 10% auto;
+    /* Center vertically and horizontally */
+    padding: 20px;
+    border: 1px solid var(--list-item-shadow);
+    width: 80%;
+    max-width: 400px;
+    /* Adjust as needed */
+    border-radius: 8px;
+    position: relative;
+}
+
+/* Close button */
+.create-modal .create-close {
+    color: var(--text-main-color);
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.create-modal .create-close:hover,
+.create-modal .create-close:focus {
+    color: var(--menu-button-color);
+    text-decoration: none;
+}
+
+/* Modal header */
+.create-modal-header h2 {
+    margin: 0;
+    color: var(--text-main-color);
+}
+
+/* Modal body */
+.create-modal-body {
+    margin-top: 20px;
+}
+
+.create-modal-body p {
+    color: var(--text-main-color);
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.create-modal-body input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--list-item-shadow);
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: var(--list-item-background);
+    color: var(--text-main-color);
+}
+
+/* Modal footer */
+.create-modal-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.create-modal-footer button {
+    background-color: var(--menu-button-color);
+    color: var(--menu-button-text);
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.create-modal-footer button:hover {
+    background-color: #5db3e3;
+    /* Adjust hover color */
+}
+
+.create-modal-footer button#cancelGroupButton {
+    background-color: var(--list-item-background);
+    color: var(--text-main-color);
+}
+
+.create-modal-footer button#cancelGroupButton:hover {
+    background-color: var(--menu-background);
+}
