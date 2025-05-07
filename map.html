@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GroupTrackr</title>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@latest"></script>
+  <!-- At the bottom of your HTML file, before the closing body tag -->
+  <!-- <script src="dropdown.js"></script> -->
+  <link rel="stylesheet" type="text/css" href="css/dropdown.css">
+  <link rel="stylesheet" type="text/css" href="css/create_join_modal.css">
+
+
+
+
+</head>
+
+<body>
+  <script>
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'Auth/login.html'
+    }
+  </script>
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner"></div>
+
+  <div id="map"></div>
+
+  <!-- Slide-out Menu -->
+  <div id="menu" class="menu">
+    <!-- Top menu containing dropdown, buttons, and close button -->
+    <div class="top-menu">
+      <div class="close-container">
+        <button class="close-menu" id="close-menu">
+          <div class="close-menu">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <circle cx="12" cy="12" r="10" stroke-width="1.5"></circle>
+                <path d="M14.5 9.50002L9.5 14.5M9.49998 9.5L14.5 14.5" stroke-width="1.5" stroke-linecap="round"></path>
+              </g>
+            </svg>
+          </div>
+
+        </button>
+      </div>
+      <h3>Group Selection</h3>
+
+      <!-- Dropdown with dynamic items -->
+      <div class="dropdown" id="customDropdown">
+        <button class="dropbtn" id="dropdownButton" onclick="toggleDropdown()">Choose Group</button>
+        <div class="dropdown-content" id="dropdownItems">
+          <!-- Dropdown Items -->
+          <!-- <div class="dropdown-item" data-value="550e8400-e29b-41d4-a716-446655440000" onclick="selectItem(this)">
+            <div class="group_avatar"></div>
+            <span>John Doe</span>
+            <button onclick="editItem('John Doe')">Edit</button>
+            <button onclick="deleteItem('John Doe')">Delete</button>
+          </div>
+          <div class="dropdown-item" data-value="550e8400-e29b-41d4-a716-446655440001" onclick="selectItem(this)">
+            <span>Jane Smith</span>
+            <button onclick="editItem('Jane Smith')">Edit</button>
+            <button onclick="deleteItem('Jane Smith')">Delete</button>
+          </div> -->
+
+          <!-- Footer with Create and Join Buttons -->
+          <div id="dropdownFooter" class="dropdown-footer">
+            <button onclick="createItem()">Create</button>
+            <button onclick="joinItem()">Join</button>
+          </div>
+        </div>
+      </div>
+      <div class="top-menu-buttons">
+        <button id="members-btn">
+          <span class="svg-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_2_187)">
+                <path
+                  d="M7.5625 13.75C10.0305 13.75 12.0312 11.7493 12.0312 9.28125C12.0312 6.81323 10.0305 4.8125 7.5625 4.8125C5.09448 4.8125 3.09375 6.81323 3.09375 9.28125C3.09375 11.7493 5.09448 13.75 7.5625 13.75Z"
+                  stroke="#080D2B" stroke-width="1.5" stroke-miterlimit="10" />
+                <path
+                  d="M13.3559 4.97901C13.9705 4.80583 14.6151 4.76638 15.2463 4.86331C15.8775 4.96024 16.4805 5.19131 17.0149 5.54094C17.5492 5.89057 18.0025 6.35065 18.344 6.89019C18.6856 7.42973 18.9076 8.0362 18.995 8.66876C19.0825 9.30131 19.0334 9.94527 18.851 10.5572C18.6686 11.1692 18.3572 11.735 17.9377 12.2165C17.5183 12.698 17.0005 13.084 16.4193 13.3485C15.8381 13.6131 15.207 13.75 14.5684 13.75C15.782 13.7492 16.978 14.0407 18.0551 14.6001C19.1321 15.1594 20.0586 15.9701 20.7559 16.9634M1.37476 16.9638C2.07268 15.9711 2.99923 15.1608 4.07616 14.6015C5.15309 14.0421 6.3488 13.7501 7.56233 13.75C8.77586 13.75 9.97159 14.0419 11.0486 14.6012C12.1255 15.1605 13.0521 15.9707 13.7501 16.9634"
+                  stroke="#080D2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </g>
+              <defs>
+                <clipPath id="clip0_2_187">
+                  <rect width="22" height="22" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span>Members</span>
+        </button>
+        <button id="places-btn">
+          <span class="svg-icon">
+            <svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" stroke="#000000">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <g>
+                  <g>
+                    <g>
+                      <path
+                        d="M255.991,213.339c35.355,0,64-28.645,64-64s-28.645-64-64-64s-64,28.645-64,64S220.636,213.339,255.991,213.339z M255.991,128.006c11.791,0,21.333,9.542,21.333,21.333s-9.542,21.333-21.333,21.333c-11.791,0-21.333-9.542-21.333-21.333 S244.2,128.006,255.991,128.006z">
+                      </path>
+                      <path
+                        d="M228.229,397.518l8.681,17.362c7.863,15.726,30.305,15.723,38.164-0.004l18.389-36.8 c18.466-36.902,35.939-66.021,75.763-128.619l1.036-1.629c5.852-9.199,8.681-13.651,12.042-18.961 c14.956-23.623,23.02-50.992,23.02-79.527c0-89.032-77.35-158.521-166.786-148.343c-66.548,7.591-121.188,60.835-130.398,127.125 c-5.511,39.683,4.604,78.394,27.526,109.517C166.5,279.435,190.243,321.574,228.229,397.518z M150.402,133.992 c6.528-46.989,45.76-85.218,92.967-90.603c64.055-7.29,119.289,42.33,119.289,105.951c0,20.39-5.735,39.855-16.403,56.706 c-3.34,5.276-6.155,9.708-11.991,18.88l-1.036,1.629c-40.148,63.109-58.184,93.122-77.28,131.152 c-33.196-65.363-56.271-105.169-85.935-145.383C153.636,190.087,146.437,162.538,150.402,133.992z">
+                      </path>
+                      <path
+                        d="M388.88,313.04c-11.464-2.719-22.961,4.371-25.68,15.835c-2.719,11.464,4.371,22.962,15.835,25.68 c57.212,13.567,90.298,35.274,90.298,50.773c0,29.478-94.949,64-213.333,64c-118.398,0-213.333-34.518-213.333-64 c0-15.508,33.053-37.209,90.236-50.773c11.464-2.719,18.553-14.217,15.834-25.681c-2.719-11.464-14.217-18.553-25.681-15.833 C48.205,330.796,0,362.445,0,405.329c0,64.804,115.134,106.667,256,106.667c140.853,0,256-41.865,256-106.667 C512,362.444,463.765,330.798,388.88,313.04z">
+                      </path>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </span>
+          <span>Places</span>
+        </button>
+      </div>
+    </div>
+    <div class="members-container" id="membersCon">
+      <!-- Members div with dynamic height and scrolling -->
+      <div class="members-div" id="membersDiv">
+
+      </div>
+      <button id="members-settings-btn">
+        <span class="svg-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"
+            style="padding-right: 5px">
+            <g clip-path="url(#clip0_2_187)">
+              <path
+                d="M7.5625 13.75C10.0305 13.75 12.0312 11.7493 12.0312 9.28125C12.0312 6.81323 10.0305 4.8125 7.5625 4.8125C5.09448 4.8125 3.09375 6.81323 3.09375 9.28125C3.09375 11.7493 5.09448 13.75 7.5625 13.75Z"
+                stroke="#080D2B" stroke-width="1.5" stroke-miterlimit="10" />
+              <path
+                d="M13.3559 4.97901C13.9705 4.80583 14.6151 4.76638 15.2463 4.86331C15.8775 4.96024 16.4805 5.19131 17.0149 5.54094C17.5492 5.89057 18.0025 6.35065 18.344 6.89019C18.6856 7.42973 18.9076 8.0362 18.995 8.66876C19.0825 9.30131 19.0334 9.94527 18.851 10.5572C18.6686 11.1692 18.3572 11.735 17.9377 12.2165C17.5183 12.698 17.0005 13.084 16.4193 13.3485C15.8381 13.6131 15.207 13.75 14.5684 13.75C15.782 13.7492 16.978 14.0407 18.0551 14.6001C19.1321 15.1594 20.0586 15.9701 20.7559 16.9634M1.37476 16.9638C2.07268 15.9711 2.99923 15.1608 4.07616 14.6015C5.15309 14.0421 6.3488 13.7501 7.56233 13.75C8.77586 13.75 9.97159 14.0419 11.0486 14.6012C12.1255 15.1605 13.0521 15.9707 13.7501 16.9634"
+                stroke="#080D2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+            <defs>
+              <clipPath id="clip0_2_187">
+                <rect width="22" height="22" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+        </span>
+        <span>Members Settings</span>
+      </button>
+    </div>
+    <div class="fences-container" id="fencesCon">
+      <div class="fences-div" id="fencesDiv">
+        <div class="fence-item" data-fence-uuid="f068e492-1d26-47ee-9662-236ec1079f87">
+          <div class="fence-icon">
+            <svg display="block" height="41px" width="27px" viewBox="0 0 27 41">
+              <g fill-rule="nonzero">
+                <g transform="translate(3.0, 29.0)" fill="#000000">
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="10.5" ry="5.25002273"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="10.5" ry="5.25002273"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="9.5" ry="4.77275007"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="8.5" ry="4.29549936"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="7.5" ry="3.81822308"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="6.5" ry="3.34094679"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="5.5" ry="2.86367051"></ellipse>
+                  <ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="4.5" ry="2.38636864"></ellipse>
+                </g>
+                <g fill="#3FB1CE">
+                  <path
+                    d="M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z">
+                  </path>
+                </g>
+                <g opacity="0.25" fill="#000000">
+                  <path
+                    d="M13.5,0 C6.0441559,0 0,6.0441559 0,13.5 C0,19.222562 6.7499993,27 12.25,34.5 C13,35.522727 14.016664,35.500004 14.75,34.5 C20.250001,27 27,19.074644 27,13.5 C27,6.0441559 20.955844,0 13.5,0 Z M13.5,1 C20.415404,1 26,6.584596 26,13.5 C26,15.898657 24.495584,19.181431 22.220703,22.738281 C19.945823,26.295132 16.705119,30.142167 13.943359,33.908203 C13.743445,34.180814 13.612715,34.322738 13.5,34.441406 C13.387285,34.322738 13.256555,34.180814 13.056641,33.908203 C10.284481,30.127985 7.4148684,26.314159 5.015625,22.773438 C2.6163816,19.232715 1,15.953538 1,13.5 C1,6.584596 6.584596,1 13.5,1 Z">
+                  </path>
+                </g>
+                <g transform="translate(6.0, 7.0)" fill="#FFFFFF"></g>
+                <g transform="translate(8.0, 8.0)">
+                  <circle fill="#000000" opacity="0.25" cx="5.5" cy="5.5" r="5.4999962"></circle>
+                  <circle fill="#FFFFFF" cx="5.5" cy="5.5" r="5.4999962"></circle>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="fence-name">Fences One</div>
+          <div class="edit-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <button id="fences-settings-btn">
+        <span class="svg-icon">
+          <svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" stroke="#000000">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+              <g>
+                <g>
+                  <g>
+                    <path
+                      d="M255.991,213.339c35.355,0,64-28.645,64-64s-28.645-64-64-64s-64,28.645-64,64S220.636,213.339,255.991,213.339z M255.991,128.006c11.791,0,21.333,9.542,21.333,21.333s-9.542,21.333-21.333,21.333c-11.791,0-21.333-9.542-21.333-21.333 S244.2,128.006,255.991,128.006z">
+                    </path>
+                    <path
+                      d="M228.229,397.518l8.681,17.362c7.863,15.726,30.305,15.723,38.164-0.004l18.389-36.8 c18.466-36.902,35.939-66.021,75.763-128.619l1.036-1.629c5.852-9.199,8.681-13.651,12.042-18.961 c14.956-23.623,23.02-50.992,23.02-79.527c0-89.032-77.35-158.521-166.786-148.343c-66.548,7.591-121.188,60.835-130.398,127.125 c-5.511,39.683,4.604,78.394,27.526,109.517C166.5,279.435,190.243,321.574,228.229,397.518z M150.402,133.992 c6.528-46.989,45.76-85.218,92.967-90.603c64.055-7.29,119.289,42.33,119.289,105.951c0,20.39-5.735,39.855-16.403,56.706 c-3.34,5.276-6.155,9.708-11.991,18.88l-1.036,1.629c-40.148,63.109-58.184,93.122-77.28,131.152 c-33.196-65.363-56.271-105.169-85.935-145.383C153.636,190.087,146.437,162.538,150.402,133.992z">
+                    </path>
+                    <path
+                      d="M388.88,313.04c-11.464-2.719-22.961,4.371-25.68,15.835c-2.719,11.464,4.371,22.962,15.835,25.68 c57.212,13.567,90.298,35.274,90.298,50.773c0,29.478-94.949,64-213.333,64c-118.398,0-213.333-34.518-213.333-64 c0-15.508,33.053-37.209,90.236-50.773c11.464-2.719,18.553-14.217,15.834-25.681c-2.719-11.464-14.217-18.553-25.681-15.833 C48.205,330.796,0,362.445,0,405.329c0,64.804,115.134,106.667,256,106.667c140.853,0,256-41.865,256-106.667 C512,362.444,463.765,330.798,388.88,313.04z">
+                    </path>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg>
+        </span>
+        <span>Places Settings</span>
+      </button>
+    </div>
+    <div id="fenceEditModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <iframe class="fenceIframe" id="fenceModalIframe" src="fences.html"></iframe>
+      </div>
+    </div>
+
+    <button class="profile-button" id="profile-button">
+      <img src="" alt="Profile Image" onerror="this.src='assets/default-profile.svg';">
+    </button>
+    <div class="profile-menu">
+      <div class="back-arrow" id="back-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="profile-section">
+        <!-- <img
+          src="https://group-api-b4pm.onrender.com/img/users/user-3b4b611c-326f-4871-b354-5ba5fdc4f736-1727112594161.jpeg"
+          alt="Profile Picture" class="profile-img" /> -->
+
+        <img src="" alt="Profile Picture" class="profile-img" onerror="this.src='assets/default-profile.svg';" />
+
+        <div class="profile-name" id="profileName">Jon Möller</div>
+        <p class="profile-location"><span>&#x1F4CD;</span> Stockholm, Sweden</p>
+
+        <!-- <button class="upgrade-btn">Upgrade Now - Go Pro</button> -->
+      </div>
+
+      <!-- Settings Section -->
+      <div class="settings-section">
+        <h4>Settings</h4>
+        <ul class="settings-list">
+          <li>
+            <span class="settings-icon">&#x1F319;</span> Dark Mode
+            <label class="switch">
+              <input type="checkbox" id="dark-mode-toggle" checked>
+              <span class="slider round"></span>
+            </label>
+          </li>
+          <li>
+            <span class="settings-icon">&#x1F514;</span> Notifications
+            <span class="toggle-btn">On</span>
+          </li>
+          <!-- <li><span class="settings-icon">&#x1F512;</span> Privacy</li>
+          <li><span class="settings-icon">&#x1F6E1;</span> Security</li> -->
+          <li><span class="settings-icon"><svg class="svg-icon"
+                style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M723.4304 508.60032c-54.12352 47.74912-125.9776 77.056-205.16352 77.056-80.36352 0-153.40032-30.2592-207.76448-79.42144-126.45376 33.09056-204.69248 146.0736-204.69248 281.04192v68.78208c0 160.96768 812.3904 160.96768 812.3904 0v-68.78208c-0.00512-131.41504-74.21952-242.5088-194.76992-278.67648z m-205.16352 28.12928c140.16512 0 254.09536-109.44 254.09536-244.63872S658.66752 47.21664 518.26688 47.21664c-139.9296 0-253.85472 109.67552-253.85472 244.87424 0 135.20384 113.92512 244.63872 253.85472 244.63872z m0 0"
+                  fill="currentColor" />
+              </svg></span> Account</li>
+          <!-- <li><span class="settings-icon">&#x2753;</span> Help</li> -->
+          <li>
+            <span class="settings-icon">
+              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <!-- <g fill="#141414" fill-rule="nonzero"> -->
+                <path
+                  d="m20 12c0 .5522847-.4477153 1-1 1s-1-.4477153-1-1c0-4.418278-3.581722-8-8-8s-8 3.581722-8 8 3.581722 8 8 8c.5522847 0 1 .4477153 1 1s-.4477153 1-1 1c-5.5228475 0-10-4.4771525-10-10s4.4771525-10 10-10 10 4.4771525 10 10z"
+                  transform="matrix(.70710678 -.70710678 .70710678 .70710678 -5.556349 10.585786)" />
+                <path
+                  d="m10 13c-.55228475 0-1-.4477153-1-1s.44771525-1 1-1h13c.5522847 0 1 .4477153 1 1s-.4477153 1-1 1z" />
+                <path
+                  d="m19.2928932 9.70710678c-.3905243-.39052429-.3905243-1.02368927 0-1.41421356s1.0236893-.39052429 1.4142136 0l3 2.99999998c.3905243.3905243.3905243 1.0236893 0 1.4142136l-3 3c-.3905243.3905243-1.0236893.3905243-1.4142136 0s-.3905243-1.0236893 0-1.4142136l2.2928932-2.2928932z" />
+                <!-- </g> -->
+              </svg>
+            </span>
+            Logout
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+  <!-- Create Group Modal -->
+  <div id="createGroupModal" class="create-modal">
+    <div class="create-modal-content">
+      <span class="create-close" id="createGroupModalClose">&times;</span>
+      <div class="create-modal-header">
+        <h2>Create New Group</h2>
+      </div>
+      <div class="create-modal-body">
+        <input type="text" id="groupNameInput" placeholder="Enter group name" />
+      </div>
+      <div class="create-modal-footer">
+        <button id="saveGroupButton">Save</button>
+        <button id="cancelGroupButton">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="joinGroupModal" class="create-modal">
+    <div class="create-modal-content">
+      <span class="create-close" id="joinGroupModalClose">&times;</span>
+      <div class="create-modal-header">
+        <h2>Join Group</h2>
+      </div>
+      <div class="create-modal-body">
+        <input type="text" id="groupCodeInput" placeholder="Group Code or Link" />
+      </div>
+      <div class="create-modal-footer">
+        <button id="joinGroupButton">Join Group</button>
+        <button id="cancelJoinGroupButton">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="toggle-menu">☰</button>
+
+  <!-- <script src="./scripts/join_group.js"></script> -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>

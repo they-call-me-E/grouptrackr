@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dynamic Lottie Lock Demo</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #f7f7f7;
+            font-family: sans-serif
+        }
+
+        #lockLottie {
+            width: 200px;
+            height: 200px
+        }
+
+        fieldset {
+            border: 0;
+            padding: 0;
+            display: flex;
+            gap: .75rem
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+            cursor: pointer
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Lottie host -->
+    <div id="lockLottie"></div>
+
+    <!-- Quick test controls -->
+    <fieldset id="stateControls" hidden> <!-- starts hidden until JSON loads -->
+        <legend>Lock State</legend>
+        <label><input type="radio" name="lockState" value="false" checked>Inactive</label>
+        <label><input type="radio" name="lockState" value="true">Active</label>
+    </fieldset>
+
+    <script>
+        (async () => {
+            /* ─── 1. Where is your Lottie JSON? ──────────────────────────────── */
+            const JSON_URL =
+                'https://raw.githubusercontent.com/they-call-me-E/Sharptools/refs/heads/main/CustomeTile/Lottie/ic_device_lock.json';
+
+            /* ─── 2. Download & parse it so we can inspect frame ranges ──────── */
+            const data = await fetch(JSON_URL).then(r => r.json());
+
+            /* Helper: build a {activate:[s,e], inactivate:[s,e]} map  */
+            function extractSegments(json) {
+                const seg = {};
+
+                // 2a. Prefer the 'scenes' array (cleaner)
+                if (Array.isArray(json.scenes)) {
+                    json.scenes.forEach(s => {
+                        if (s.type === 'activate') seg.activate = [s.startFrame, s.endFrame];
+                        if (s.type === 'inactivate') seg.inactivate = [s.startFrame, s.endFrame];
+                    });
+                }
+
+                // 2b. Fallback to markers with :start / :end pairs
+                if ((!seg.activate || !seg.inactivate) && Array.isArray(json.markers)) {
+                    const m = Object.fromEntries(json.markers.map(x => [x.cm, x.tm]));
+                    if (!seg.activate && m['activate:start'] != null && m['activate:end'] != null)
+                        seg.activate = [m['activate:start'], m['activate:end']];
+                    if (!seg.inactivate && m['inactivate:start'] != null && m['inactivate:end'] != null)
+                        seg.inactivate = [m['inactivate:start'], m['inactivate:end']];
+                }
+                return seg;
+            }
+
+            const segments = extractSegments(data);
+
+            if (!segments.activate || !segments.inactivate) {
+                console.error('Could not find activate / inactivate ranges in JSON', segments);
+                return alert('This Lottie file is missing activate/inactivate scenes or markers.');
+            }
+
+            /* ─── 3. Drop it into the page ───────────────────────────────────── */
+            const container = document.getElementById('lockLottie');
+            const anim = lottie.loadAnimation({
+                container,
+                renderer: 'svg',
+                loop: false,
+                autoplay: false,
+                animationData: data  // we already have the JSON object
+            });
+
+            /* ─── 4. Helper for outside callers (true = active, false = inactive) */
+            function setLockState(isActive) {
+                const seg = isActive ? segments.activate : segments.inactivate;
+                anim.playSegments(seg, true);
+            }
+
+            /* ─── 5. Show first frame & reveal controls when DOM is ready ────── */
+            /* ─── 5. Show first frame & reveal controls when DOM is ready ────── */
+            anim.addEventListener('DOMLoaded', () => {           // ← fixed
+                // Park on the very first frame of the INACTIVE range
+                anim.goToAndStop(segments.inactivate[0], /*isFrame=*/true);
+
+                // Sync and reveal the radio UI
+                const controls = document.getElementById('stateControls');
+                controls.hidden = false;
+                controls.querySelector('input[value="false"]').checked = true;
+            });
+
+
+
+
+            /* ─── 6. Wire demo radio buttons → setLockState() ────────────────── */
+            document.getElementById('stateControls')
+                .addEventListener('change', e => {
+                    if (e.target.name === 'lockState') {
+                        setLockState(e.target.value === 'true');
+                    }
+                });
+
+            /* ——— 7.  You can call setLockState(true|false) from anywhere now ——— */
+        })();
+    </script>
+</body>
+
+</html>

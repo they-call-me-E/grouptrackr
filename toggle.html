@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Neumorphic Wi-Fi Toggle</title>
+    <style>
+        :root {
+            /* Neumorphic color & sizing variables */
+            --bg: #e0e0e0;
+            --shadow-light: #ffffff;
+            --shadow-dark: #bebebe;
+            --accent: #3FB1CE;
+            --size-w: 100px;
+            --size-h: 40px;
+            --radius: calc(var(--size-h) / 2);
+            --transition: 0.25s ease;
+        }
+
+        /* Center page background */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            font-family: sans-serif;
+        }
+
+        /* The toggle “pill” */
+        .wifi-toggle {
+            position: relative;
+            width: var(--size-w);
+            height: var(--size-h);
+            border: none;
+            border-radius: var(--radius);
+            background: var(--bg);
+            box-shadow:
+                inset 5px 5px 10px var(--shadow-dark),
+                inset -5px -5px 10px var(--shadow-light);
+            cursor: pointer;
+            /* remove default padding so we can absolutely position children */
+            padding: 0;
+            transition: background var(--transition), box-shadow var(--transition);
+        }
+
+        .wifi-toggle:focus {
+            outline: none;
+            box-shadow:
+                inset 5px 5px 10px var(--shadow-dark),
+                inset -5px -5px 10px var(--shadow-light),
+                0 0 0 3px rgba(63, 177, 206, 0.5);
+        }
+
+        /* Wi-Fi icon + label */
+        .wifi-toggle .icon-label {
+            position: absolute;
+            top: 50%;
+            left: 48px;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            color: #999;
+            font-size: 0.7rem;
+            transition: color var(--transition);
+        }
+
+        .wifi-toggle .icon-label svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            fill: currentColor;
+            transition: fill var(--transition);
+        }
+
+        /* The sliding knob */
+        .wifi-toggle .handle {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(var(--size-h) - 8px);
+            height: calc(var(--size-h) - 8px);
+            background: var(--bg);
+            border-radius: 50%;
+            box-shadow:
+                5px 5px 10px var(--shadow-dark),
+                -5px -5px 10px var(--shadow-light);
+            transition:
+                left var(--transition),
+                background var(--transition),
+                box-shadow var(--transition);
+        }
+
+        /* ON state */
+        .wifi-toggle[aria-checked="true"] {
+            background: var(--accent);
+            box-shadow:
+                5px 5px 10px var(--shadow-dark),
+                -5px -5px 10px var(--shadow-light);
+        }
+
+        .wifi-toggle[aria-checked="true"] .handle {
+            left: calc(100% - var(--size-h) + 4px);
+            background: var(--accent);
+            box-shadow:
+                inset 3px 3px 6px var(--shadow-dark),
+                inset -3px -3px 6px var(--shadow-light);
+        }
+
+        .wifi-toggle[aria-checked="true"] .icon-label {
+            color: #fff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Accessible toggle button -->
+    <button class="wifi-toggle" role="switch" aria-checked="false" aria-label="Wi-Fi Toggle">
+        <span class="icon-label">
+            <!-- Simple Wi-Fi SVG icon -->
+
+            Locked
+        </span>
+        <span class="handle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                    d="M12 18c.83 0 1.5-.67 1.5-1.5S12.83 15 12 15s-1.5.67-1.5 1.5S11.17 18 12 18zm4.95-2.05c.29-.29.29-.77 0-1.06A7.497 7.497 0 0012 10.5c-1.96 0-3.77.8-5.05 2.11-.29.29-.29.77 0 1.06.29.29.77.29 1.06 0C8.65 12.92 10.26 12 12 12c1.74 0 3.35.92 4.95 2.05zM12 6c3.31 0 6.31 1.34 8.48 3.52.29.29.77.29 1.06 0s.29-.77 0-1.06A10.948 10.948 0 0012 4c-3.04 0-5.82 1.16-7.84 3.16-.29.29-.29.77 0 1.06s.77.29 1.06 0C5.69 7.34 8.69 6 12 6z" />
+            </svg>
+        </span>
+    </button>
+
+    <script>
+        const wifiBtn = document.querySelector('.wifi-toggle');
+
+        function toggleWiFi() {
+            const isOn = wifiBtn.getAttribute('aria-checked') === 'true';
+            wifiBtn.setAttribute('aria-checked', String(!isOn));
+            console.log(`Wi-Fi is ${!isOn ? 'On' : 'Off'}`);
+        }
+
+        // click handler
+        wifiBtn.addEventListener('click', toggleWiFi);
+
+        // keyboard support (Space / Enter)
+        wifiBtn.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                toggleWiFi();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
