@@ -58,7 +58,7 @@ document.getElementById('signin-form').addEventListener('submit', async function
             console.log("Avatar saved in sessionStorage:", data.user.avatar);
             console.log('User Id: ', data.user.uuid);
             // Redirect to map_testing.html in the parent directory
-            window.location.href = "../map.html";
+            window.location.href = "../index.html";
 
         } else {
             // Error: handle the error case
