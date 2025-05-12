@@ -605,8 +605,7 @@ function updateOrAddMemberToMenu(memberData, bgColor) {
 
     const memberSpeedDiv = document.createElement("div");
     memberSpeedDiv.className = "card-member-speed";
-    memberSpeedDiv.textContent = speed != null ? `Speed: ${speed} MPH` : `Speed: N/A`;
-
+    memberSpeedDiv.textContent = speed != null ? `Speed: ${Math.round(speed)} MPH` : `Speed: N/A`;
     // Append content to contentDiv
     contentDiv.appendChild(memberNameDiv);
     contentDiv.appendChild(memberSpeedDiv);
@@ -687,7 +686,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
 
         const speedSpan = document.createElement("span");
         speedSpan.classList.add("badge-speed");
-        speedSpan.textContent = `${speed} mph`;
+        speedSpan.textContent = `${Math.round(speed)} mph`;
 
         newBadgeDiv.appendChild(badgeImg);
         newBadgeDiv.appendChild(speedSpan);
@@ -821,7 +820,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
     const content = `
       <div class="content">
         <strong class="popup-member-name">${memberData.name}</strong><br>
-       <span class="popup-member-speed">${speed != null ? `Speed: ${speed} MPH` : `Speed: N/A`}</span>
+       <span class="popup-member-speed">${speed != null ? `Speed: ${Math.round(speed)} MPH` : `Speed: N/A`}</span>
         <span class="popup-screen-on">Screen:</span><span class="popup-screen-on-value"> ${screenStatus}</span>
         <span class="popup-lat">Lat:</span><span class="popup-lat-value">${latitude}</span>
         <span class="popup-long">Long:</span><span class="popup-long-value">${longitude}</span>
