@@ -157,12 +157,11 @@
     </div>
   </div>
 
- <script>
+<script>
   const token = sessionStorage.getItem('token');
   if (!token) {
-    window.location.href = 'Auth/login.html'
+    window.location.href = 'Auth/login.html';
   }
-  console.log("Token: ", token);
 
   mapboxgl.accessToken = 'pk.eyJ1IjoidGhleWNhbGxtZWUiLCJhIjoiY2xhZXF6anQxMHgzazNxczNzd2I5em10dyJ9.fa-pBQ_2cMg9H2fD-FBCDg';
   let groupUUID = null;
@@ -241,15 +240,10 @@
         document.getElementById('lon').value = lon;
 
         const reverseGeocodeURL = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${mapboxgl.accessToken}`;
-
         fetch(reverseGeocodeURL)
           .then(response => response.json())
           .then(data => {
-            if (data.features?.length) {
-              document.getElementById('address').value = data.features[0].place_name;
-            } else {
-              document.getElementById('address').value = "Address not found.";
-            }
+            document.getElementById('address').value = data.features?.[0]?.place_name || "Address not found.";
           })
           .catch(() => {
             document.getElementById('address').value = "Error retrieving address.";
@@ -306,7 +300,7 @@
     };
 
     const url = isCreate
-      ? `https://group-api-b4pm.onrender.com/api/groups/${groupUUID}/fences`
+      ? `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/create`
       : `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/update`;
 
     const method = isCreate ? 'POST' : 'PATCH';
@@ -324,7 +318,6 @@
         return response.json();
       })
       .then(data => {
-        console.log('Response data:', data);
         window.parent.postMessage({
           action: 'geofenceSaved',
           fenceUUID: isCreate ? data.uuid : fenceUUID,
@@ -356,7 +349,6 @@
         if (!response.ok) throw new Error(`Error: ${response.status}`);
       })
       .then(() => {
-        console.log('Sending deletion message to parent');
         window.parent.postMessage({
           action: 'geofenceDeleted',
           fenceUUID,
