@@ -2006,4 +2006,4 @@ setInterval(async () => {
   } finally {
     isFetchingMembers = false;
   }
-}, 15000);
+}, 5000);
