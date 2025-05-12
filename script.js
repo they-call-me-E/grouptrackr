@@ -701,7 +701,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
         console.log(
           `Updating badge for member: ${memberData.name} with speed: ${speed} mph`
         );
-        badgeDiv.querySelector(".badge-speed").textContent = `${speed} mph`;
+        badgeDiv.querySelector(".badge-speed").textContent = `${Math.round(speed)} mph`;
 
         // Hide or show badge based on location_sharing
         badgeDiv.style.visibility = memberData.status.location_sharing
