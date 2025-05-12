@@ -570,7 +570,7 @@ function updateOrAddMemberToMenu(memberData, bgColor) {
 
     if (memberData.avatar) {
       const img = document.createElement("img");
-      img.src = 'https://group-api-b4pm.onrender.com/img/users/' + memberData.avatar;
+      img.src = memberData.avatar;
 
       img.onerror = function () {
         avatarDiv.removeChild(img);
@@ -740,8 +740,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
     if (memberData.avatar) {
       // Create an image element and set the source
       const avatarImg = document.createElement("img");
-      avatarImg.src =
-        "https://group-api-b4pm.onrender.com/img/users/" + memberData.avatar;
+      avatarImg.src = memberData.avatar;
 
       // Handle image load success
       avatarImg.onload = function () {
@@ -810,8 +809,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
     if (memberData.avatar) {
       // If an avatar exists, create an image element and set the source
       const img = document.createElement("img");
-      img.src =
-        "https://group-api-b4pm.onrender.com/img/users/" + memberData.avatar;
+      img.src = memberData.avatar;
       expandedDiv.appendChild(img);
     }
 
