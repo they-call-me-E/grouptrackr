@@ -287,52 +287,65 @@
   }
 
   document.getElementById('saveFenceData').addEventListener('click', function () {
-    const fenceName = document.getElementById('name').value;
-    const lat = document.getElementById('lat').value;
-    const lon = document.getElementById('lon').value;
-    const radius = document.getElementById('radiusSlider').value;
+  const fenceName = document.getElementById('name').value;
+  const lat = document.getElementById('lat').value;
+  const lon = document.getElementById('lon').value;
+  const radius = document.getElementById('radiusSlider').value;
 
-    const payload = {
-      name: fenceName,
-      latitude: parseFloat(lat),
-      longitude: parseFloat(lon),
-      radius: parseInt(radius)
-    };
+  // Validate inputs
+  if (!fenceName || !lat || !lon || !radius) {
+    alert('Please fill in all required fields.');
+    return;
+  }
 
-    const url = isCreate
-      ? `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/create`
-      : `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/update`;
+  const payload = {
+    name: fenceName,
+    latitude: parseFloat(lat),
+    longitude: parseFloat(lon),
+    radius: parseInt(radius)
+  };
 
-    const method = isCreate ? 'POST' : 'PATCH';
+  const url = isCreate
+    ? `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/create`
+    : `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/update`;
 
-    fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
+  const method = isCreate ? 'POST' : 'PATCH';
+
+  fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(response => {
+      const status = response.status;
+      const action = isCreate ? 'created' : 'updated';
+      if (!response.ok) {
+        return response.text().then(text => {
+          alert(`Failed to ${action} geofence: HTTP ${status} - ${text}`);
+          throw new Error(`Error: ${status} - ${text}`);
+        });
+      }
+      alert(`Geofence ${action} successfully: HTTP ${status}`);
+      return response.json();
     })
-      .then(response => {
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        window.parent.postMessage({
-          action: 'geofenceSaved',
-          fenceUUID: isCreate ? data.uuid : fenceUUID,
-          latitude: parseFloat(lat),
-          longitude: parseFloat(lon),
-          radius: parseInt(radius),
-          name: fenceName,
-          closeModal: true
-        }, '*');
-      })
-      .catch(error => {
-        console.error('Error saving fence data:', error);
-        alert(`Error saving fence data: ${error.message}`);
-      });
-  });
+    .then(data => {
+      window.parent.postMessage({
+        action: 'geofenceSaved',
+        fenceUUID: isCreate ? data.uuid : fenceUUID,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lon),
+        radius: parseInt(radius),
+        name: fenceName,
+        closeModal: true
+      }, '*');
+    })
+    .catch(error => {
+      console.error('Error saving fence data:', error);
+    });
+});
 
   document.getElementById('deleteFenceData').addEventListener('click', function () {
     if (!confirm('Are you sure you want to delete this geofence?')) return;
