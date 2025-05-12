@@ -550,7 +550,7 @@ function updateOrAddMemberToMenu(memberData, bgColor) {
     if (memberSpeed) {
       const speed = memberData.status?.speed;
       if (speed != null) {
-        memberSpeed.textContent = `${speed} MPH`;
+        memberSpeed.textContent = `${Math.round(speed)} MPH`;
       } else {
         memberSpeed.textContent = `Speed: N/A`;
       }
