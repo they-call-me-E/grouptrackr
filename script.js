@@ -1994,6 +1994,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // Set an interval to update member markers every 15 seconds
-//setInterval(() => {
-//  fetchmembersData(); // Fetch and update members data every 15 seconds
-//}, 15000); // 15 seconds
+setInterval(() => {
+  fetchmembersData(); // Fetch and update members data every 15 seconds
+}, 15000); // 15 seconds
