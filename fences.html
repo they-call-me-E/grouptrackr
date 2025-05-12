@@ -157,277 +157,219 @@
     </div>
   </div>
 
-  <script>
+ <script>
+  const token = sessionStorage.getItem('token');
+  if (!token) {
+    window.location.href = 'Auth/login.html'
+  }
+  console.log("Token: ", token);
 
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      window.location.href = 'Auth/login.html'
+  mapboxgl.accessToken = 'pk.eyJ1IjoidGhleWNhbGxtZWUiLCJhIjoiY2xhZXF6anQxMHgzazNxczNzd2I5em10dyJ9.fa-pBQ_2cMg9H2fD-FBCDg';
+  let groupUUID = null;
+  let fenceUUID = null;
+  let isCreate = false;
+
+  window.onload = function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    isCreate = urlParams.get('create') === 'true';
+    fenceUUID = urlParams.get('fenceUUID');
+    const fenceName = urlParams.get('name') || '';
+    const fenceRadius = urlParams.get('radius') || '250';
+    const fenceLat = urlParams.get('lat');
+    const fenceLon = urlParams.get('lon');
+    groupUUID = urlParams.get('groupid');
+
+    const fenceLatNum = parseFloat(fenceLat);
+    const fenceLonNum = parseFloat(fenceLon);
+    let radiusInFeet = parseInt(fenceRadius);
+
+    if (isCreate) {
+      document.getElementById('deleteFenceData').disabled = true;
+      document.getElementById('geofenceHeading').innerText = 'Create New Geofence';
+      document.getElementById('saveFenceData').innerText = 'Create Location';
     }
-    console.log("Token: ", token);
 
+    if (fenceLat && fenceLon) {
+      document.getElementById('name').value = fenceName;
+      document.getElementById('radiusSlider').value = radiusInFeet;
+      document.getElementById('radiusDisplay').innerText = `${radiusInFeet} ft`;
+      document.getElementById('lat').value = fenceLat;
+      document.getElementById('lon').value = fenceLon;
 
-    // Use the new Mapbox access token you supplied
-    mapboxgl.accessToken = 'pk.eyJ1IjoidGhleWNhbGxtZWUiLCJhIjoiY2xhZXF6anQxMHgzazNxczNzd2I5em10dyJ9.fa-pBQ_2cMg9H2fD-FBCDg';
-    let groupUUID = null;
-    let fenceUUID = null;
-    window.onload = function () {
-      const queryString = window.location.search; // Get query string from the URL
-      const urlParams = new URLSearchParams(queryString);
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v10',
+        center: [fenceLonNum, fenceLatNum],
+        zoom: 16
+      });
 
-      // Extract values
-      isCreate = urlParams.get('create') === 'true'; // Check if create=true
-      fenceUUID = urlParams.get('fenceUUID');
-      const fenceName = urlParams.get('name') || '';
-      const fenceRadius = urlParams.get('radius') || '250';
-      const fenceLat = urlParams.get('lat');
-      const fenceLon = urlParams.get('lon');
-      groupUUID = urlParams.get('groupid');
+      map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-      console.log(groupUUID);
-      console.log("FenceUUID: ", fenceUUID);
+      const marker = new mapboxgl.Marker({ draggable: false })
+        .setLngLat([fenceLonNum, fenceLatNum])
+        .addTo(map);
 
-      // Parse lat/lon
-      const fenceLatNum = parseFloat(fenceLat);
-      const fenceLonNum = parseFloat(fenceLon);
-
-      // Initialize variables
-      let radiusInFeet = fenceRadius ? parseInt(fenceRadius) : 250;
-
-      if (isCreate) {
-        console.log('isCreate');
-        // Disable the delete button in create mode
-        document.getElementById('deleteFenceData').disabled = true;
-        // Update heading and button text
-        document.getElementById('geofenceHeading').innerText = 'Create New Geofence';
-        document.getElementById('saveFenceData').innerText = 'Create Location';
-
-      }
-
-      // if (fenceUUID && fenceName && fenceRadius && fenceLat && fenceLon) {
-      if (fenceRadius && fenceLat && fenceLon) {
-        document.getElementById('name').value = fenceName;
-        document.getElementById('radiusSlider').value = radiusInFeet;
-        document.getElementById('radiusDisplay').innerText = `${radiusInFeet} ft`;
-        document.getElementById('lat').value = fenceLat;
-        document.getElementById('lon').value = fenceLon;
-
-        // Initialize the map with the lat/lon from the URL
-        var map = new mapboxgl.Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/dark-v10',
-          center: [fenceLonNum, fenceLatNum], // Default map center
-          zoom: 16
+      map.on('load', function () {
+        map.addSource('geofence', {
+          type: 'geojson',
+          data: createGeoJSONCircle([fenceLonNum, fenceLatNum], radiusInFeet)
         });
 
-        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        map.addLayer({
+          id: 'geofence-layer',
+          type: 'fill',
+          source: 'geofence',
+          paint: {
+            'fill-color': '#007bff',
+            'fill-opacity': 0.3
+          }
+        });
+      });
 
-        // Marker initialization
-        var marker = new mapboxgl.Marker({ draggable: false })
-          .setLngLat([fenceLonNum, fenceLatNum])
-          .addTo(map);
+      map.on('move', function () {
+        const center = map.getCenter();
+        marker.setLngLat(center);
+        map.getSource('geofence').setData(createGeoJSONCircle([center.lng, center.lat], radiusInFeet));
+      });
 
-        // Create a source and layer for the geofence circle
-        map.on('load', function () {
-          map.addSource('geofence', {
-            'type': 'geojson',
-            'data': createGeoJSONCircle([fenceLonNum, fenceLatNum], radiusInFeet)
-          });
+      map.on('moveend', function () {
+        const center = map.getCenter();
+        const lat = center.lat.toFixed(6);
+        const lon = center.lng.toFixed(6);
 
-          map.addLayer({
-            'id': 'geofence-layer',
-            'type': 'fill',
-            'source': 'geofence',
-            'layout': {},
-            'paint': {
-              'fill-color': '#007bff',
-              'fill-opacity': 0.3
+        document.getElementById('lat').value = lat;
+        document.getElementById('lon').value = lon;
+
+        const reverseGeocodeURL = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${mapboxgl.accessToken}`;
+
+        fetch(reverseGeocodeURL)
+          .then(response => response.json())
+          .then(data => {
+            if (data.features?.length) {
+              document.getElementById('address').value = data.features[0].place_name;
+            } else {
+              document.getElementById('address').value = "Address not found.";
             }
+          })
+          .catch(() => {
+            document.getElementById('address').value = "Error retrieving address.";
           });
-        });
+      });
 
-        // Update the geofence when the map moves
-        map.on('move', function () {
-          var center = map.getCenter();
-          marker.setLngLat(center);
-          map.getSource('geofence').setData(createGeoJSONCircle([center.lng, center.lat], radiusInFeet));
-        });
+      document.getElementById('radiusSlider').addEventListener('input', function () {
+        radiusInFeet = parseInt(this.value);
+        document.getElementById('radiusDisplay').innerText = `${radiusInFeet} ft`;
+        const center = map.getCenter();
+        map.getSource('geofence').setData(createGeoJSONCircle([center.lng, center.lat], radiusInFeet));
+      });
+    }
+  };
 
-        // Automatically update coordinates and address after map movement ends
-        map.on('moveend', function () {
-          var center = map.getCenter();
-          var lat = center.lat.toFixed(6);
-          var lon = center.lng.toFixed(6);
+  function createGeoJSONCircle(center, radiusInFeet) {
+    const radiusInMeters = radiusInFeet * 0.3048;
+    const points = 64;
+    const coords = { latitude: center[1], longitude: center[0] };
+    const km = radiusInMeters / 1000;
+    const ret = [];
 
-          // Update the Latitude and Longitude input fields
-          document.getElementById('lat').value = lat;
-          document.getElementById('lon').value = lon;
+    const distanceX = km / (111.32 * Math.cos(coords.latitude * Math.PI / 180));
+    const distanceY = km / 110.574;
 
-          // Reverse geocode to get the new address based on map center
-          const updatedGeocodingUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${mapboxgl.accessToken}`;
+    for (let i = 0; i < points; i++) {
+      const theta = (i / points) * 2 * Math.PI;
+      const x = distanceX * Math.cos(theta);
+      const y = distanceY * Math.sin(theta);
+      ret.push([coords.longitude + x, coords.latitude + y]);
+    }
+    ret.push(ret[0]);
 
-          fetch(updatedGeocodingUrl)
-            .then(response => response.json())
-            .then(data => {
-              if (data && data.features && data.features.length > 0) {
-                const updatedAddress = data.features[0].place_name;
-                document.getElementById('address').value = updatedAddress; // Update address
-              } else {
-                document.getElementById('address').value = "Address not found.";
-              }
-            })
-            .catch(error => {
-              document.getElementById('address').value = "Error retrieving address.";
-            });
-        });
-
-        // Update the geofence circle radius when the slider changes
-        var radiusSlider = document.getElementById('radiusSlider');
-        var radiusDisplay = document.getElementById('radiusDisplay');
-
-        radiusSlider.addEventListener('input', function () {
-          radiusInFeet = parseInt(this.value); // Update the radius value
-          radiusDisplay.innerText = `${radiusInFeet} ft`;
-
-          // Update the geofence circle with the new radius
-          var center = map.getCenter();
-          map.getSource('geofence').setData(createGeoJSONCircle([center.lng, center.lat], radiusInFeet));
-        });
-      } else {
-        console.error("Some parameters are missing in the URL.");
+    return {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [ret]
       }
     };
+  }
 
-    // Function to create a GeoJSON circle
-    function createGeoJSONCircle(center, radiusInFeet) {
-      var radiusInMeters = radiusInFeet * 0.3048; // Convert feet to meters
-      var points = 64; // Number of points to create the circle
-      var coords = {
-        latitude: center[1], // Center latitude
-        longitude: center[0] // Center longitude
-      };
-      var km = radiusInMeters / 1000; // Convert meters to kilometers
+  document.getElementById('saveFenceData').addEventListener('click', function () {
+    const fenceName = document.getElementById('name').value;
+    const lat = document.getElementById('lat').value;
+    const lon = document.getElementById('lon').value;
+    const radius = document.getElementById('radiusSlider').value;
 
-      var ret = [];
-      var distanceX = km / (111.32 * Math.cos(coords.latitude * Math.PI / 180));
-      var distanceY = km / 110.574;
+    const payload = {
+      name: fenceName,
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+      radius: parseInt(radius)
+    };
 
-      for (var i = 0; i < points; i++) {
-        var theta = (i / points) * (2 * Math.PI);
-        var x = distanceX * Math.cos(theta);
-        var y = distanceY * Math.sin(theta);
+    const url = isCreate
+      ? `https://group-api-b4pm.onrender.com/api/groups/${groupUUID}/fences`
+      : `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/update`;
 
-        ret.push([coords.longitude + x, coords.latitude + y]);
-      }
-      ret.push(ret[0]); // Close the circle by repeating the first coordinate
+    const method = isCreate ? 'POST' : 'PATCH';
 
-      return {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [ret]
-        }
-      };
-    }
-
-
-    document.getElementById('saveFenceData').addEventListener('click', function () {
-      const fenceName = document.getElementById('name').value;
-      const lat = document.getElementById('lat').value;
-      const lon = document.getElementById('lon').value;
-      const radius = document.getElementById('radiusSlider').value;
-
-      const payload = {
-        name: fenceName,
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lon),
-        radius: parseInt(radius)
-      };
-
-      const url = `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/update`;
-
-      fetch(url, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` // Add the authorization token if needed
-        },
-        body: JSON.stringify(payload)
+    fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return response.json();
       })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          // alert(`Fence data updated successfully!`);
-          console.log('Response data:', data);
-          // Close the modal
-          window.parent.postMessage({
-            action: 'geofenceSaved',
-            fenceUUID: fenceUUID,
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lon),
-            radius: parseInt(radius),
-            name: fenceName,
-            closeModal: true
-          }, '*');
+      .then(data => {
+        console.log('Response data:', data);
+        window.parent.postMessage({
+          action: 'geofenceSaved',
+          fenceUUID: isCreate ? data.uuid : fenceUUID,
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lon),
+          radius: parseInt(radius),
+          name: fenceName,
+          closeModal: true
+        }, '*');
+      })
+      .catch(error => {
+        console.error('Error saving fence data:', error);
+        alert(`Error saving fence data: ${error.message}`);
+      });
+  });
 
-        })
-        .catch(error => {
-          console.error('Error updating fence data:', error);
-          alert(`Error updating fence data: ${error.message}`);
-        });
-    });
+  document.getElementById('deleteFenceData').addEventListener('click', function () {
+    if (!confirm('Are you sure you want to delete this geofence?')) return;
 
+    const url = `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/delete`;
 
-    // Event listener for deleting fence data
-    document.getElementById('deleteFenceData').addEventListener('click', function () {
-      if (confirm('Are you sure you want to delete this geofence?')) {
-        const url = `https://group-api-b4pm.onrender.com/api/group/${groupUUID}/fences/${fenceUUID}/delete`;
-
-        fetch(url, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`Error: ${response.status} ${response.statusText}`);
-            }
-            // No need to parse response body for 204 No Content
-            return;
-          })
-          .then(() => {
-            // alert('Geofence deleted successfully.');
-            // Log the message being sent
-            console.log('Sending message to parent:', {
-              action: 'geofenceDeleted',
-              fenceUUID: fenceUUID,
-              closeModal: true
-            });
-
-            // Notify the parent window
-            window.parent.postMessage({
-              action: 'geofenceDeleted',
-              fenceUUID: fenceUUID,
-              closeModal: true
-            }, '*');
-            // Notify the parent window about the deletion
-            // window.parent.postMessage({ action: 'geofenceDeleted', fenceUUID: fenceUUID }, '*');
-
-            // Close the modal or iframe
-            window.close();
-          })
-          .catch(error => {
-            console.error('Error deleting geofence:', error);
-            alert(`Error deleting geofence: ${error.message}`);
-          });
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    });
-
-  </script>
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+      })
+      .then(() => {
+        console.log('Sending deletion message to parent');
+        window.parent.postMessage({
+          action: 'geofenceDeleted',
+          fenceUUID,
+          closeModal: true
+        }, '*');
+        window.close();
+      })
+      .catch(error => {
+        console.error('Error deleting geofence:', error);
+        alert(`Error deleting geofence: ${error.message}`);
+      });
+  });
+</script>
 
 
 </body>
