@@ -3,7 +3,8 @@ if (!token) {
   window.location.href = 'Auth/login.html'
 }
 const userName = sessionStorage.getItem('name');
-const userAvatar = 'https://group-api-b4pm.onrender.com/img/users/' + sessionStorage.getItem('avatar');
+//const userAvatar = 'https://group-api-b4pm.onrender.com/img/users/' + sessionStorage.getItem('avatar');
+const userAvatar = sessionStorage.getItem('avatar');
 //const userAvatar = 'https://raw.githubusercontent.com/they-call-me-E/Sharptools/main/CustomeTile/Mapviewer/pngimg.com%20-%20deadpool_PNG15.png';
 const avatarBG = getRandomColor();
 
