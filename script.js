@@ -782,7 +782,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
       badgeDiv.classList.add("badge");
 
       const badgeImg = document.createElement("img");
-      badgeImg.src = "../assets/car.svg"; // Update with your correct asset path
+      badgeImg.src = "https://they-call-me-e.github.io/Mapviewer/assets/car.svg"; // Update with your correct asset path
       const speedSpan = document.createElement("span");
       speedSpan.classList.add("badge-speed");
       speedSpan.textContent = `${speed} mph`;
