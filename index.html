@@ -26,7 +26,8 @@
   <script>
     const token = sessionStorage.getItem('token');
     if (!token) {
-      window.location.href = 'https://they-call-me-e.github.io/Mapviewer/auth/login.html'
+      //window.location.href = 'https://they-call-me-e.github.io/Mapviewer/auth/login.html'
+      window.location.href = '../auth/login.html'
     }
   </script>
   <!-- Loading Spinner -->
@@ -287,7 +288,7 @@
                   fill="currentColor" />
               </svg></span> Account</li>
           <!-- <li><span class="settings-icon">&#x2753;</span> Help</li> -->
-          <li>
+          <li class="logout-item" id="logout-item">
             <span class="settings-icon">
               <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                 <!-- <g fill="#141414" fill-rule="nonzero"> -->
