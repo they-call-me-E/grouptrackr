@@ -548,7 +548,10 @@ function updateOrAddMemberToMenu(memberData, bgColor) {
       memberName.textContent = memberData.name;
     }
     if (memberSpeed) {
-      const speed = memberData.status?.speed;
+      // if MPH convert to mph
+      const speed = memberData.status?.speed != null ? memberData.status.speed * 0.621371 : null;
+      // kph
+      // const speed = memberData.status?.speed;
       if (speed != null) {
         memberSpeed.textContent = `${Math.round(speed)} MPH`;
       } else {
@@ -1990,19 +1993,126 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+// ... (Previous code unchanged until window.addEventListener('message'))
 
+// Add event listener for messages from fences.html
+window.addEventListener('message', function (event) {
+  console.log('Message received from child:', event.data);
+  console.log('Event origin:', event.origin);
 
-let isFetchingMembers = false;
+  // Security check: Ensure the message is from a trusted origin
+  if (
+    event.origin !== 'http://127.0.0.1:5500' &&
+    event.origin !== 'http://localhost' &&
+    event.origin !== 'https://your-trusted-origin.com'
+  ) {
+    console.warn('Untrusted origin:', event.origin);
+    return;
+  }
 
-setInterval(async () => {
-  if (isFetchingMembers) return;
+  if (event.data.action === 'geofenceSaved') {
+    const { fenceUUID, latitude, longitude, radius, name, groupUUID } = event.data;
+    console.log('Processing geofence save for UUID:', fenceUUID);
+
+    // Validate data
+    if (!fenceUUID || isNaN(latitude) || isNaN(longitude) || !groupUUID) {
+      console.error('Invalid geofenceSaved data:', event.data);
+      return;
+    }
+
+    // Refresh fences data from API
+    fetchFenceData();
+
+    // Close the modal if requested
+    if (event.data.closeModal) {
+      console.log('Calling closeModal()');
+      closeModal();
+    } else {
+      console.log('closeModal flag not set');
+    }
+  }
+
+  if (event.data.action === 'geofenceDeleted') {
+    const { fenceUUID, groupUUID } = event.data;
+    console.log('Processing geofence deletion for UUID:', fenceUUID);
+
+    // Validate data
+    if (!fenceUUID || !groupUUID) {
+      console.error('Invalid geofenceDeleted data:', event.data);
+      return;
+    }
+
+    // Refresh fences data from API
+    fetchFenceData();
+
+    // Close the modal if requested
+    if (event.data.closeModal) {
+      console.log('Calling closeModal()');
+      closeModal();
+    } else {
+      console.log('closeModal flag not set');
+    }
+  }
+});
+
+// Modified fetchFenceData to clear existing data first
+async function fetchFenceData() {
+  console.log("Fetching geofence data...");
+
+  if (!groupId) {
+    console.error("GroupId not found in localStorage! Skipping geofence data fetch.");
+    return;
+  }
 
   try {
-    isFetchingMembers = true;
-    await fetchmembersData();
-  } catch (err) {
-    console.error("Interval fetchmembersData error:", err);
-  } finally {
-    isFetchingMembers = false;
+    // Clear existing fences from map and menu
+    removeMapData();
+
+    const response = await fetch(
+      `https://group-api-b4pm.onrender.com/api/groups/${groupId}/fences`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    places = data;
+    console.log("Fence data fetched:", data);
+
+    if (data && data.document) {
+      data.document.forEach((geofence) => {
+        addGeofence(geofence, color);
+        addFenceToMenu(geofence);
+      });
+    } else {
+      console.error("Geofence data structure is incorrect:", data);
+    }
+  } catch (error) {
+    console.error("Error fetching geofence data:", error);
+    alert("Failed to fetch geofence data. Please try again later.");
   }
-}, 5000);
+}
+
+// ... (Rest of script.js unchanged: addGeofence, addFenceToMenu, etc.)
+
+
+// let isFetchingMembers = false;
+
+// setInterval(async () => {
+//   if (isFetchingMembers) return;
+
+//   try {
+//     isFetchingMembers = true;
+//     await fetchmembersData();
+//   } catch (err) {
+//     console.error("Interval fetchmembersData error:", err);
+//   } finally {
+//     isFetchingMembers = false;
+//   }
+//  }, 5000);
