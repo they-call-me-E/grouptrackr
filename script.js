@@ -1132,6 +1132,14 @@ document.querySelector('#profileName').addEventListener('click', function () {
   inputField.addEventListener('blur', saveName);
 });
 
+//Logout User
+document.getElementById('logout-item').addEventListener('click', function () {
+  sessionStorage.clear(); // Clear all session data
+  window.location.href = '../auth/login.html'; // Redirect to login page
+});
+
+
+
 // Toggle dropdown visibility
 function toggleDropdown() {
   const dropdown = document.getElementById('customDropdown');
