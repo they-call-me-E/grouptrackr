@@ -1530,7 +1530,7 @@ window.addEventListener('message', function (event) {
   if (
     event.origin !== 'http://127.0.0.1:5500' &&
     event.origin !== 'http://localhost' &&
-    event.origin !== 'https://your-trusted-origin.com'
+    event.origin !== 'https://they-call-me-e.github.io'
   ) {
     console.warn('Untrusted origin:', event.origin);
     return;
