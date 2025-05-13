@@ -462,7 +462,7 @@
           // Attempt to close the modal directly (same-origin only)
           setTimeout(() => {
             try {
-              const modal = window.parent.document.getElementById('geofenceModal');
+              const modal = window.parent.document.getElementById('fenceEditModal');
               if (modal) {
                 modal.style.display = 'none';
                 modal.classList.remove('show');
@@ -510,7 +510,7 @@
           // Attempt to close the modal directly (same-origin only)
           setTimeout(() => {
             try {
-              const modal = window.parent.document.getElementById('geofenceModal');
+              const modal = window.parent.document.getElementById('fenceEditModal');
               if (modal) {
                 modal.style.display = 'none';
                 modal.classList.remove('show');
