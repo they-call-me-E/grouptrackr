@@ -2110,17 +2110,17 @@ async function fetchFenceData() {
 // ... (Rest of script.js unchanged: addGeofence, addFenceToMenu, etc.)
 
 
-// let isFetchingMembers = false;
+ let isFetchingMembers = false;
 
-// setInterval(async () => {
-//   if (isFetchingMembers) return;
+ setInterval(async () => {
+   if (isFetchingMembers) return;
 
-//   try {
-//     isFetchingMembers = true;
-//     await fetchmembersData();
-//   } catch (err) {
-//     console.error("Interval fetchmembersData error:", err);
-//   } finally {
-//     isFetchingMembers = false;
-//   }
-//  }, 5000);
+   try {
+     isFetchingMembers = true;
+     await fetchmembersData();
+   } catch (err) {
+     console.error("Interval fetchmembersData error:", err);
+   } finally {
+     isFetchingMembers = false;
+   }
+  }, 5000);
