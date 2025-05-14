@@ -1,6 +1,6 @@
 // const token = sessionStorage.getItem('token');
 if (!token) {
-  window.location.href = 'https://they-call-me-e.github.io/auth/login.html'
+  window.location.href = 'https://they-call-me-e.github.io/Mapviewer/auth/login.html'
 }
 const userName = sessionStorage.getItem('name');
 //const userAvatar = 'https://group-api-b4pm.onrender.com/img/users/' + sessionStorage.getItem('avatar');
