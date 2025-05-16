@@ -1,11 +1,11 @@
 // const token = sessionStorage.getItem('token');
 if (!token) {
-  window.location.href = 'https://they-call-me-e.github.io/Mapviewer/auth/login.html'
+  window.location.href = 'https://they-call-me-e.github.io/GroupTrackR/auth/login.html'
 }
 const userName = sessionStorage.getItem('name');
 //const userAvatar = 'https://group-api-b4pm.onrender.com/img/users/' + sessionStorage.getItem('avatar');
 const userAvatar = sessionStorage.getItem('avatar');
-//const userAvatar = 'https://raw.githubusercontent.com/they-call-me-E/Sharptools/main/CustomeTile/Mapviewer/pngimg.com%20-%20deadpool_PNG15.png';
+//const userAvatar = 'https://raw.githubusercontent.com/they-call-me-E/Sharptools/main/CustomeTile/GroupTrackR/pngimg.com%20-%20deadpool_PNG15.png';
 const avatarBG = getRandomColor();
 
 
@@ -685,7 +685,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
         newBadgeDiv.classList.add("badge");
 
         const badgeImg = document.createElement("img");
-        badgeImg.src = "https://they-call-me-e.github.io/Mapviewer/assets/car.svg"; // Update with your correct asset path
+        badgeImg.src = "https://they-call-me-e.github.io/GroupTrackR/assets/car.svg"; // Update with your correct asset path
 
         const speedSpan = document.createElement("span");
         speedSpan.classList.add("badge-speed");
@@ -785,7 +785,7 @@ function updateOrAddMemberMarker(memberData, bgColor) {
       badgeDiv.classList.add("badge");
 
       const badgeImg = document.createElement("img");
-      badgeImg.src = "https://they-call-me-e.github.io/Mapviewer/assets/car.svg"; // Update with your correct asset path
+      badgeImg.src = "https://they-call-me-e.github.io/GroupTrackR/assets/car.svg"; // Update with your correct asset path
       const speedSpan = document.createElement("span");
       speedSpan.classList.add("badge-speed");
       speedSpan.textContent = `${speed} mph`;
