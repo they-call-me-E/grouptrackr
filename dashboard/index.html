@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group TrackR Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #007aff;
+            --bg-dark: #07101d;
+            --bg-light: #f9f9f9;
+            --text-dark: #111;
+            --accent: #3FB1CE;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6fa;
+            color: var(--text-dark);
+        }
+
+        /* Topbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            height: 55px;
+            margin-right: 12px;
+        }
+
+        .topbar-left h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.25rem;
+        }
+
+        .user-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            margin-right: 30px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 60px;
+            background: var(--bg-dark);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .sidebar i {
+            color: #fff;
+            font-size: 1.4em;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        .sidebar i.active-icon {
+            border-radius: 8px;
+            background: var(--accent);
+            padding: 6px;
+        }
+
+        /* Main */
+        .main {
+            margin-left: 60px;
+            margin-top: 60px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        input,
+        select,
+        button {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        thead th {
+            background: #e3ebf9;
+            padding: 14px;
+            font-size: 14px;
+            text-align: left;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        thead th.sort-asc::after {
+            content: ' ▲';
+            font-size: .8em;
+        }
+
+        thead th.sort-desc::after {
+            content: ' ▼';
+            font-size: .8em;
+        }
+
+        tbody tr td {
+            background: #fff;
+            padding: 14px;
+            font-size: 14px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: #e3ebf9;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-online {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #d32f2f;
+        }
+
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .pagination-bar select,
+        .pagination-bar button {
+            padding: 6px 8px;
+            font-size: .9rem;
+        }
+
+        .pagination-bar button:disabled {
+            opacity: .4;
+            cursor: default;
+        }
+
+        .pagination-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #pageInfo {
+            white-space: nowrap;
+            font-size: .9rem;
+        }
+
+        /* Summary cards */
+        #summarySection {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .summary-cards {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform .1s;
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        /* Copy */
+        .copy-btn {
+            margin-left: 6px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo"
+                src="https://raw.githubusercontent.com/they-call-me-E/GroupTrackR/main/assets/group_trackr_icon.png"
+                alt="Logo" />
+            <h2 id="topbarTitle">Overview</h2>
+        </div>
+        <div class="user-circle">AD</div>
+    </div>
+
+    <div class="sidebar">
+        <i class="fa-solid fa-cube" id="dashboard_icon"></i>
+        <i class="fa-solid fa-user" id="users_table_icon"></i>
+        <i class="fa-solid fa-users" id="groups_table_icon"></i>
+        <i class="fa-solid fa-location-dot" id="fences_table_icon"></i>
+        <i class="fa-regular fa-pen-to-square"></i>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">Overview</h2>
+            <div>
+                <button>+ Add User</button>
+                <button>+ Create Group</button>
+            </div>
+        </div>
+
+        <div id="summarySection"></div>
+
+        <div class="top-bar">
+            <input type="text" placeholder="Search" id="searchInput" oninput="filterMain()" />
+            <select id="searchColumn"></select>
+            <!-- <select id="statusFilter">
+                <option>All Status</option>
+            </select> -->
+        </div>
+
+        <div class="pagination-bar">
+            <div>
+                Show
+                <select id="rowsPerPage">
+                    <option>5</option>
+                    <option selected>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                </select>
+                rows
+            </div>
+            <div class="pagination-right">
+                <button id="prevPage" disabled>‹ Prev</button>
+                <span id="pageInfo">Showing 0–0 of 0</span>
+                <button id="nextPage" disabled>Next ›</button>
+            </div>
+        </div>
+
+        <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+
+        <div id="fencesSection"></div>
+        <div id="membersSection"></div>
+    </div>
+
+    <script>
+        // API & Auth
+        const SUMMARY_API_URL = 'https://group-api-b4pm.onrender.com/api/data';
+        const USERS_API_URL = 'https://group-api-b4pm.onrender.com/api/users';
+        const GROUPS_API_URL = 'https://group-api-b4pm.onrender.com/api/groups';
+        const FENCES_API_URL = 'https://group-api-b4pm.onrender.com/api/fences';
+        const TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjNWMxMmFiLTVmMWItNDRmNy05OWVlLTlmMDUzOWExM2Y1MCIsIm5hbWUiOiJKYWtlIE1vaGwiLCJlbWFpbCI6Impha2Vtb2hsQGdtYWlsLmNvbSIsImlhdCI6MTc0NzIzOTc0MiwiZXhwIjoxNzU1MDE1NzQyfQ.w7qz0W0DDKGmzYbTU-JtWL9URi-4o8H6bn1tN-xBP2c';
+
+        // STATE
+        let currentTable = 'users',
+            data = [],
+            sortColumn = null,
+            sortDirection = 1,
+            currentPage = 1,
+            rowsPerPage = 10;
+
+        let fencesData = [], fencesPage = 1, fencesPerPage = 10;
+        let membersData = [], membersPage = 1, membersPerPage = 10;
+
+        // DOM refs
+        const rowsPerPageSelect = document.getElementById('rowsPerPage'),
+            prevBtn = document.getElementById('prevPage'),
+            nextBtn = document.getElementById('nextPage'),
+            pageInfo = document.getElementById('pageInfo'),
+            summarySection = document.getElementById('summarySection'),
+            topBar = document.querySelector('.top-bar'),
+            mainPag = document.querySelector('.pagination-bar'),
+            dataTable = document.getElementById('dataTable');
+
+        // CONFIGS
+        const tableConfigs = {
+            users: {
+                title: 'Users',
+                headers: [
+                    // { name: 'Avatar', sortable: false, search: false, value: 'avatar' },
+                    { name: 'Name', type: 'string', search: true, value: 'name' },
+                    { name: 'Email', type: 'string', search: true, value: 'email' },
+                    { name: 'UUID', type: 'string', search: true, value: 'uuid' },
+                    // { name: 'Phone', type: 'string', search: true, value: 'phone' },
+                    // { name: 'Relation', type: 'string', search: true, value: 'relation' },
+                    // { name: 'Address', type: 'string', search: true, value: 'address' },
+                    // { name: 'Sharing', type: 'boolean', search: true, value: 'sharing' },
+                    // { name: 'Moving', type: 'string', search: true, value: 'moving' },
+                    // { name: 'Speed', type: 'number', search: true, value: 'speed' },
+                    // { name: 'Battery', type: 'number', search: true, value: 'battery' },
+                    { name: 'Last Updated', type: 'date', search: true, value: 'last_updated' },
+                    { name: 'Created', type: 'date', search: true, value: 'createdAt' }
+                ],
+                getValue(i, h) {
+                    switch (h.value) {
+                        case 'avatar': return '';
+                        case 'name': return `<span class="name-text">${i.name}</span>  <i class="fa-regular fa-pen-to-square edit-btn" data-id="${i.uuid}" title="Edit"></i>`;
+                        case 'email': return i.email || '-';
+                        case 'uuid': return i.uuid || '-';
+                        case 'phone': return i.phone || '-';
+                        case 'relation': return i.relation || '-';
+                        case 'address': return i.location.address || '-';
+                        case 'speed': return i.status.speed != null ? i.status.speed.toFixed(1) + ' m/s' : '-';
+                        case 'battery': return i.status.device.battery_level != null ? i.status.device.battery_level + '%' : '-';
+                        case 'last_updated': return new Date(i.updatedAt).toLocaleString();
+                        case 'createdAt': return new Date(i.createdAt).toLocaleString();
+                    }
+                    return '';
+                }
+            },
+            groups: {
+                title: 'Groups',
+                headers: [
+                    { name: 'Name', type: 'string', search: true, value: 'name' },
+                    { name: 'UUID', type: 'string', search: true, value: 'uuid' },
+                    { name: 'Created At', type: 'date', search: false, value: 'createdAt' },
+                    { name: 'Member Count', type: 'number', search: true, value: 'memberCount' },
+                    { name: 'Fences', sortable: false, search: false, value: 'fences' }
+                ],
+                getValue(i, h) {
+                    switch (h.value) {
+                        case 'name': return i.name || '-';
+                        case 'createdAt': return new Date(i.createdAt).toLocaleString();
+                        case 'memberCount': return i.memberCount != null ? i.memberCount : '-';
+                    }
+                    return '';
+                }
+            },
+            fences: {
+                title: 'Fences',
+                headers: [
+                    { name: 'Name', value: 'name' },
+                    { name: 'UUID', value: 'uuid' },
+                    { name: 'Latitude', value: 'latitude' },
+                    { name: 'Longitude', value: 'longitude' },
+                    { name: 'Radius', value: 'radius' },
+                    { name: 'Group Count', value: 'groupCount' },
+                    { name: 'Created At', value: 'createdAt' },
+                    { name: 'Updated At', value: 'updatedAt' }
+                ],
+                getValue(i, h) {
+                    switch (h.value) {
+                        case 'createdAt':
+                        case 'updatedAt':
+                            return new Date(i[h.value]).toLocaleString();
+                    }
+                    return i[h.value];
+                }
+            }
+        };
+
+        // FETCH + RETRY
+        async function fetchWithRetry(url, opts = {}, retries = 3, delay = 500) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const r = await fetch(url, { ...opts, headers: { ...opts.headers, 'Authorization': TOKEN } });
+                    if (!r.ok) {
+                        const t = await r.text().catch(() => ``);
+                        throw new Error(`HTTP ${r.status}: ${t}`);
+                    }
+                    return await r.json();
+                } catch (e) {
+                    if (i < retries - 1) await new Promise(r => setTimeout(r, delay));
+                    else throw e;
+                }
+            }
+        }
+
+        function clearFences() { document.getElementById('fencesSection').innerHTML = ''; }
+        function clearMembers() { document.getElementById('membersSection').innerHTML = ''; }
+        function setActiveIcon(tab) {
+            document.querySelectorAll('.sidebar i').forEach(i => i.classList.remove('active-icon'));
+            const id = tab === 'dashboard' ? 'dashboard_icon' : `${tab}_table_icon`;
+            document.getElementById(id).classList.add('active-icon');
+        }
+        function setTitles(str) {
+            document.getElementById('topbarTitle').textContent = str;
+            document.getElementById('pageTitle').textContent = str;
+        }
+
+        // GENERIC TABLE RENDERER
+        function renderTable({ headers, items, tbodySel, emptyMsg, cellHTML }) {
+            const tbody = document.querySelector(tbodySel);
+            tbody.innerHTML = '';
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="error-message">${emptyMsg}</td></tr>`;
+                return;
+            }
+            items.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(h => {
+                    const td = document.createElement('td');
+                    td.innerHTML = cellHTML(row, h);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // COPY ICON HANDLER
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).catch(console.error);
+        }
+        document.body.addEventListener('click', e => {
+            if (e.target.classList.contains('copy-btn')) {
+                copyToClipboard(e.target.dataset.uuid);
+            }
+        });
+
+        document.body.addEventListener('click', e => {
+            if (!e.target.matches('.edit-btn')) return;
+            const td = e.target.closest('td');
+            const id = e.target.dataset.id;
+            const span = td.querySelector('.name-text');
+            const current = span.textContent;
+
+            // swap span+icon → input
+            td.innerHTML = `<input type="text" class="edit-input" data-id="${id}" value="${current}"/>`;
+            td.querySelector('.edit-input').focus();
+        });
+        // 2) Save on Enter key
+        document.body.addEventListener('keydown', async e => {
+            if (!e.target.matches('.edit-input') || e.key !== 'Enter') return;
+            await saveNameChange(e.target);
+        });
+
+        // 3) Save on blur (when the user clicks/tabs away)
+        document.body.addEventListener('blur', async e => {
+            if (e.target.matches('.edit-input')) {
+                await saveNameChange(e.target);
+            }
+        }, true); // useCapture so blur bubbles up
+
+        // 4) Helper to send the update & swap back to span+icon
+        async function saveNameChange(input) {
+            const newName = input.value.trim();
+            const uuid = input.dataset.id;
+            if (!newName) return;
+
+            // build form-data payload
+            const form = new FormData();
+            form.append('name', newName);
+
+            try {
+                await fetch(
+                    `https://group-api-b4pm.onrender.com/api/users/${uuid}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': TOKEN   // don’t set Content-Type—browser will add multipart boundary
+                        },
+                        body: form
+                    }
+                );
+
+                // on success, render back to text + edit icon
+                const td = input.closest('td');
+                td.innerHTML = `<span class="name-text">${newName}</span>  <i class="fa-regular fa-pen-to-square edit-btn" data-id="${uuid}" title="Edit"></i>`;
+            } catch (err) {
+                console.error('Failed to save name:', err);
+                // you can optionally show an inline error here
+            }
+        }
+
+
+        // — SHOW OVERVIEW
+        async function showSummary() {
+            summarySection.style.display = 'block';
+            topBar.style.display = 'none';
+            mainPag.style.display = 'none';
+            dataTable.style.display = 'none';
+            clearFences();
+            clearMembers();
+
+            setActiveIcon('dashboard');
+            setTitles('Overview');
+            summarySection.innerHTML = `<p>Loading summary…</p>`;
+
+            try {
+                const resp = await fetchWithRetry(SUMMARY_API_URL);
+                const d = resp.data || {};
+                summarySection.innerHTML = `
+          <div class="summary-cards">
+            <div class="card" id="card-users">
+              <h3>Total Users</h3><p>${d.totalUsers || 0}</p>
+            </div>
+            <div class="card" id="card-groups">
+              <h3>Total Groups</h3><p>${d.totalGroups || 0}</p>
+            </div>
+            <div class="card" id="card-fences">
+              <h3>Total Fences</h3><p>${d.totalFences || 0}</p>
+            </div>
+          </div>`;
+                document.getElementById('card-users').onclick = () => fetchData('users');
+                document.getElementById('card-groups').onclick = () => fetchData('groups');
+            } catch (e) {
+                summarySection.innerHTML = `<p class="error-message">Error loading summary: ${e.message}</p>`;
+            }
+        }
+
+        // — FETCH & SHOW ANY TABLE
+        async function fetchData(tableType) {
+            summarySection.style.display = 'none';
+            topBar.style.display = 'flex';
+            mainPag.style.display = 'flex';
+            dataTable.style.display = 'table';
+            clearFences();
+            clearMembers();
+
+            setActiveIcon(tableType);
+            currentTable = tableType;
+            sortColumn = null;
+            sortDirection = 1;
+            currentPage = 1;
+            setTitles(tableConfigs[tableType].title);
+
+            buildMainHeader();
+            const tbody = dataTable.querySelector('tbody');
+            tbody.innerHTML = `<tr><td colspan="100" class="error-message">Loading…</td></tr>`;
+
+            try {
+                let url, payload;
+                if (tableType === 'users') {
+                    url = USERS_API_URL;
+                } else if (tableType === 'groups') {
+                    url = GROUPS_API_URL;
+                } else if (tableType === 'fences') {
+                    url = FENCES_API_URL;
+                }
+                const resp = await fetchWithRetry(url);
+                if (tableType === 'users') data = resp.users;
+                else if (tableType === 'groups') data = resp.document || [];
+                else if (tableType === 'fences') data = resp.fences;
+                renderMainTable(data);
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="100" class="error-message">Error: ${e.message}</td></tr>`;
+            }
+        }
+
+        function buildMainHeader() {
+            const cfg = tableConfigs[currentTable];
+            const thead = dataTable.querySelector('thead');
+            thead.innerHTML = '';
+            const tr = document.createElement('tr');
+            cfg.headers.forEach((h, i) => {
+                const th = document.createElement('th');
+                th.textContent = h.name;
+                if (h.sortable !== false) {
+                    th.dataset.type = h.type;
+                    th.dataset.index = i;
+                    th.onclick = () => sortMain(i);
+                }
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+
+            const sc = document.getElementById('searchColumn');
+            sc.innerHTML = '';
+            cfg.headers.forEach(h => {
+                if (h.search) {
+                    const opt = document.createElement('option');
+                    opt.value = h.value; opt.textContent = h.name;
+                    sc.appendChild(opt);
+                }
+            });
+        }
+
+        function renderMainTable(items) {
+            updateMainPaging(items.length);
+            const start = (currentPage - 1) * rowsPerPage;
+            const slice = items.slice(start, start + rowsPerPage);
+
+            renderTable({
+                headers: tableConfigs[currentTable].headers,
+                items: slice,
+                tbodySel: '#dataTable tbody',
+                emptyMsg: `No ${currentTable} available.`,
+                cellHTML: (i, h) => {
+                    switch (h.value) {
+                        case 'avatar':
+                            const avatarUrl = i.avatar
+                                || 'https://raw.githubusercontent.com/they-call-me-E/GroupTrackR/main/assets/default-profile.svg';
+                            return `<img class="avatar" src="${avatarUrl}" alt="Avatar"/>`;
+
+                        case 'fences':
+                            return `<button class="fences-btn" data-id="${i.uuid}" data-name="${i.name}"><i class="fa-solid fa-location-dot" id="fences_table_icon"></i>  Places</button>`;
+                        // in your renderMainTable’s cellHTML switch:
+                        case 'name':
+                            return `<span class="name-text">${i.name}  </span><i class="fa-regular fa-pen-to-square edit-btn" data-id="${i.uuid}" title="Edit"></i>`;
+
+                        case 'uuid':
+                            let html = `<span>${i.uuid}</span>`;
+                            if (currentTable === 'groups') {
+                                html += ` <i class="fa-solid fa-info-circle info-btn"
+                             data-id="${i.uuid}"
+                             data-name="${i.name}"
+                             style="margin-left:8px;cursor:pointer;"></i>`;
+                            }
+                            html += ` <i class="far fa-copy copy-btn" data-uuid="${i.uuid}" title="Copy UUID"></i>`;
+                            return html;
+                        case 'sharing':
+                            return i.status.location_sharing
+                                ? `<span class="status-online">Yes</span>`
+                                : 'No';
+                        default:
+                            return tableConfigs[currentTable].getValue(i, h);
+                    }
+                }
+            });
+
+            attachMainBtns();
+        }
+
+        function sortMain(idx) {
+            const cfg = tableConfigs[currentTable];
+            const ths = dataTable.querySelectorAll('thead th');
+            const th = ths[idx];
+            const type = th.dataset.type;
+            sortDirection = (sortColumn === idx) ? -sortDirection : 1;
+            sortColumn = idx;
+            ths.forEach(x => x.classList.remove('sort-asc', 'sort-desc'));
+            th.classList.add(sortDirection === 1 ? 'sort-asc' : 'sort-desc');
+            data.sort((a, b) => {
+                const va = cfg.getValue(a, cfg.headers[idx]);
+                const vb = cfg.getValue(b, cfg.headers[idx]);
+                if (type === 'string') return sortDirection * va.localeCompare(vb);
+                return sortDirection * (va - vb);
+            });
+            renderMainTable(data);
+        }
+
+        function filterMain() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const col = document.getElementById('searchColumn').value;
+            const cfg = tableConfigs[currentTable];
+            const filtered = data.filter(i => {
+                const h = cfg.headers.find(x => x.value === col);
+                return !h || cfg.getValue(i, h).toLowerCase().includes(q);
+            });
+            currentPage = 1;
+            renderMainTable(filtered);
+        }
+
+        function updateMainPaging(total) {
+            const start = total ? ((currentPage - 1) * rowsPerPage + 1) : 0;
+            const end = Math.min(total, currentPage * rowsPerPage);
+            pageInfo.textContent = `Showing ${start}–${end} of ${total}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = end >= total;
+        }
+
+        function attachMainBtns() {
+            document.querySelectorAll('.fences-btn')
+                .forEach(b => b.onclick = () => { clearMembers(); fetchFences(b.dataset.id, b.dataset.name); });
+            document.querySelectorAll('.info-btn')
+                .forEach(b => b.onclick = () => { clearFences(); fetchGroupDetails(b.dataset.id, b.dataset.name); });
+        }
+
+        // — FENCES FOR A GROUP
+        async function fetchFences(gid, gname) {
+            clearMembers();
+            fencesData = []; fencesPage = 1; fencesPerPage = 10;
+            const sec = document.getElementById('fencesSection');
+            sec.innerHTML = `
+        <h3>Fences for Group ${gname} (${gid})</h3>
+        <div class="pagination-bar">
+          <div>Show
+            <select id="fenceRows">
+              <option>5</option><option selected>10</option>
+              <option>25</option><option>50</option>
+            </select> rows
+          </div>
+          <div class="pagination-right">
+            <button id="fencePrev" disabled>‹ Prev</button>
+            <span id="fenceInfo"></span>
+            <button id="fenceNext" disabled>Next ›</button>
+          </div>
+        </div>
+        <table id="fenceTable">
+          <thead><tr>
+            <th>Name</th><th>UUID</th><th>Latitude</th>
+            <th>Longitude</th><th>Radius</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>`;
+            try {
+                const resp = await fetchWithRetry(
+                    `https://group-api-b4pm.onrender.com/api/groups/${gid}/fences`
+                );
+                fencesData = resp.document || [];
+                setupFencePaging();
+                renderFenceTable();
+            } catch (e) {
+                sec.innerHTML = `<p class="error-message">Failed to load fences: ${e.message}</p>`;
+            }
+        }
+
+        function setupFencePaging() {
+            const sel = document.getElementById('fenceRows'),
+                prev = document.getElementById('fencePrev'),
+                next = document.getElementById('fenceNext');
+            sel.onchange = () => { fencesPerPage = +sel.value; fencesPage = 1; renderFenceTable(); };
+            prev.onclick = () => { if (fencesPage > 1) { fencesPage--; renderFenceTable(); } };
+            next.onclick = () => {
+                const tp = Math.ceil(fencesData.length / fencesPerPage);
+                if (fencesPage < tp) { fencesPage++; renderFenceTable(); }
+            };
+        }
+
+        function renderFenceTable() {
+            const info = document.getElementById('fenceInfo');
+            const tbody = document.querySelector('#fenceTable tbody');
+            tbody.innerHTML = '';
+            const n = fencesData.length;
+            const start = n ? ((fencesPage - 1) * fencesPerPage + 1) : 0;
+            const end = Math.min(n, fencesPage * fencesPerPage);
+            info.textContent = `Showing ${start}–${end} of ${n}`;
+            document.getElementById('fencePrev').disabled = fencesPage === 1;
+            document.getElementById('fenceNext').disabled = end >= n;
+            const slice = fencesData.slice((fencesPage - 1) * fencesPerPage, start + fencesPerPage);
+            const fenceHeaders = tableConfigs.fences.headers.slice(0, 5);
+            renderTable({
+                headers: fenceHeaders,
+                items: slice,
+                tbodySel: '#fenceTable tbody',
+                emptyMsg: 'No fences available.',
+                cellHTML: (f, h) => {
+                    if (h.value === 'name') {
+                        return `<span class="name-text">${f.name}  </span><i class="fa-regular fa-pen-to-square edit-btn" data-id="${f.uuid}" title="Edit"></i>`;
+                    }
+                    if (h.value === 'uuid') {
+                        return `<span>${f.uuid}</span><i class="far fa-copy copy-btn" data-uuid="${f.uuid}" title="Copy UUID"></i>`;
+                    }
+                    return f[h.value];
+                }
+            });
+        }
+
+        // — GROUP MEMBERS
+        async function fetchGroupDetails(gid, gname) {
+            clearFences();
+            membersData = []; membersPage = 1; membersPerPage = 10;
+            const sec = document.getElementById('membersSection');
+            sec.innerHTML = `
+        <h3>Group Members for ${gname} (${gid})</h3>
+        <div class="pagination-bar">
+          <div>Show
+            <select id="memRows">
+              <option>5</option><option selected>10</option>
+              <option>25</option><option>50</option>
+            </select> rows
+          </div>
+          <div class="pagination-right">
+            <button id="memPrev" disabled>‹ Prev</button>
+            <span id="memInfo"></span>
+            <button id="memNext" disabled>Next ›</button>
+          </div>
+        </div>
+        <table id="memTable">
+          <thead><tr>
+            <th>Member Name</th><th>UUID</th><th>Admin</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>`;
+            try {
+                const resp = await fetchWithRetry(`https://group-api-b4pm.onrender.com/api/groups/${gid}`);
+                const doc = resp.document || {};
+                const admins = new Set((doc.adminList || []).map(a => a.uuid));
+                membersData = (doc.members || []).map(m => ({
+                    uuid: m.uuid,
+                    name: m.name,
+                    isAdmin: admins.has(m.uuid)
+                }));
+                setupMembersPaging();
+                renderMembersTable();
+            } catch (e) {
+                sec.innerHTML = `<p class="error-message">Failed to load members: ${e.message}</p>`;
+            }
+        }
+
+        function setupMembersPaging() {
+            const sel = document.getElementById('memRows'),
+                prev = document.getElementById('memPrev'),
+                next = document.getElementById('memNext');
+            sel.onchange = () => { membersPerPage = +sel.value; membersPage = 1; renderMembersTable(); };
+            prev.onclick = () => { if (membersPage > 1) { membersPage--; renderMembersTable(); } };
+            next.onclick = () => {
+                const tp = Math.ceil(membersData.length / membersPerPage);
+                if (membersPage < tp) { membersPage++; renderMembersTable(); }
+            };
+        }
+
+        function renderMembersTable() {
+            const info = document.getElementById('memInfo');
+            const tbody = document.querySelector('#memTable tbody');
+            tbody.innerHTML = '';
+            const n = membersData.length;
+            const start = n ? ((membersPage - 1) * membersPerPage + 1) : 0;
+            const end = Math.min(n, membersPage * membersPerPage);
+            info.textContent = `Showing ${start}–${end} of ${n}`;
+            document.getElementById('memPrev').disabled = membersPage === 1;
+            document.getElementById('memNext').disabled = end >= n;
+
+            renderTable({
+                headers: [
+                    { name: 'Member Name', value: 'name' },
+                    { name: 'UUID', value: 'uuid' },
+                    { name: 'Admin', value: 'admin' }
+                ],
+                items: membersData.slice((membersPage - 1) * membersPerPage, start + membersPerPage),
+                tbodySel: '#memTable tbody',
+                emptyMsg: 'No members available.',
+                cellHTML: (m, h) => {
+                    if (h.value === 'name') {
+                        return `<span class="name-text">${m.name}</span><i class="fa-regular fa-pen-to-square edit-btn" data-id="${m.uuid}" title="Edit"></i>`;
+                    }
+                    if (h.value === 'uuid') {
+                        return `<span>${m.uuid}</span>
+                    <i class="far fa-copy copy-btn" data-uuid="${m.uuid}" title="Copy UUID"></i>`;
+                    }
+                    if (h.value === 'admin') {
+                        return m.isAdmin
+                            ? `<i class="fa-solid fa-user-shield" style="color:var(--accent)"></i>`
+                            : '';
+                    }
+                    return m[h.value];
+                }
+            });
+        }
+
+        // Wire up
+        document.getElementById('dashboard_icon').onclick = showSummary;
+        document.getElementById('users_table_icon').onclick = () => fetchData('users');
+        document.getElementById('groups_table_icon').onclick = () => fetchData('groups');
+        document.getElementById('fences_table_icon').onclick = () => fetchData('fences');
+
+        rowsPerPageSelect.onchange = () => {
+            rowsPerPage = +rowsPerPageSelect.value;
+            currentPage = 1;
+            renderMainTable(data);
+        };
+        prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderMainTable(data); } };
+        nextBtn.onclick = () => {
+            const tp = Math.ceil(data.length / rowsPerPage);
+            if (currentPage < tp) { currentPage++; renderMainTable(data); }
+        };
+
+        // Initial load
+        (async () => {
+            document.getElementById('searchInput').value = '';
+            setActiveIcon('dashboard');
+            await showSummary();
+        })();
+    </script>
+</body>
+
+</html>
