@@ -524,6 +524,109 @@ async function fetchmembersData() {
 
 function updateOrAddMemberToMenu(memberData, bgColor) {
   const membersDiv = document.getElementById("membersDiv");
+  const memberId = memberData.uuid || memberData._id;
+
+  if (
+    !memberData.location ||
+    memberData.location.latitude == null ||
+    memberData.location.longitude == null
+  ) {
+    console.warn(`Member ${memberData.name} does not have valid location data. Skipping menu addition.`);
+    return;
+  }
+
+  let memberBox = document.querySelector(`[data-member-id="${memberId}"]`);
+  const lat = memberData.location.latitude;
+  const lng = memberData.location.longitude;
+
+  if (memberBox) {
+    // Update name and speed text
+    const memberName = memberBox.querySelector(".card-member-name");
+    const memberSpeed = memberBox.querySelector(".card-member-speed");
+
+    if (memberName) memberName.textContent = memberData.name;
+
+    const speed = memberData.status?.speed != null ? Math.round(memberData.status.speed * 0.621371) : null;
+    if (memberSpeed) memberSpeed.textContent = speed != null ? `Speed: ${speed} MPH` : `Speed: N/A`;
+
+    // Update coordinates
+    memberBox.setAttribute("data-latitude", lat);
+    memberBox.setAttribute("data-longitude", lng);
+
+    // Rebind click handler (ensure it uses updated coords)
+    memberBox.onclick = function () {
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 15,
+        essential: true,
+      });
+      document.body.classList.remove("menu-open");
+    };
+  } else {
+    // Create a new member box
+    memberBox = document.createElement("div");
+    memberBox.className = "member-box";
+    memberBox.setAttribute("data-member-id", memberId);
+    memberBox.setAttribute("data-latitude", lat);
+    memberBox.setAttribute("data-longitude", lng);
+
+    const avatarDiv = document.createElement("div");
+    avatarDiv.className = "member-avatar";
+
+    if (memberData.avatar) {
+      const img = document.createElement("img");
+      img.src = memberData.avatar;
+      img.onerror = function () {
+        avatarDiv.removeChild(img);
+        const initialsDiv = document.createElement("div");
+        initialsDiv.classList.add("init-cir");
+        initialsDiv.textContent = getInitials(memberData.name);
+        initialsDiv.style.backgroundColor = bgColor;
+        avatarDiv.appendChild(initialsDiv);
+      };
+      avatarDiv.appendChild(img);
+    } else {
+      const initialsDiv = document.createElement("div");
+      initialsDiv.classList.add("init-cir");
+      initialsDiv.textContent = getInitials(memberData.name);
+      initialsDiv.style.backgroundColor = bgColor;
+      avatarDiv.appendChild(initialsDiv);
+    }
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "member-content";
+
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "card-member-name";
+    nameDiv.textContent = memberData.name;
+
+    const speed = memberData.status?.speed != null ? Math.round(memberData.status.speed * 0.621371) : null;
+    const speedDiv = document.createElement("div");
+    speedDiv.className = "card-member-speed";
+    speedDiv.textContent = speed != null ? `Speed: ${speed} MPH` : `Speed: N/A`;
+
+    contentDiv.appendChild(nameDiv);
+    contentDiv.appendChild(speedDiv);
+
+    memberBox.appendChild(avatarDiv);
+    memberBox.appendChild(contentDiv);
+
+    // Add click handler to fly to updated coordinates
+    memberBox.onclick = function () {
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 15,
+        essential: true,
+      });
+      document.body.classList.remove("menu-open");
+    };
+
+    membersDiv.appendChild(memberBox);
+  }
+}
+
+function updateOrAddMemberToMenu_bak(memberData, bgColor) {
+  const membersDiv = document.getElementById("membersDiv");
   const memberId = memberData.uuid || memberData._id; // Unique member ID
 
   // Check if member has valid location data
